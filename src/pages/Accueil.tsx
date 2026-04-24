@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import PersonalDescription from "@/components/PersonalDescription";
+import PersonalInfo from "@/components/PersonalInfo";
 
 const Accueil = () => {
   const { user, signOut } = useAuth();
@@ -27,7 +27,7 @@ const Accueil = () => {
           </button>
         </header>
 
-        <PersonalDescription />
+        <PersonalInfo />
       </div>
     </main>
   );
