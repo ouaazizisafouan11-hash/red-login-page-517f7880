@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import WeatherCard from "@/components/WeatherCard";
+import PersonalDescription from "@/components/PersonalDescription";
 
 const Accueil = () => {
   const { user, signOut } = useAuth();
@@ -27,7 +27,7 @@ const Accueil = () => {
           </button>
         </header>
 
-        <WeatherCard />
+        <PersonalDescription />
       </div>
     </main>
   );
