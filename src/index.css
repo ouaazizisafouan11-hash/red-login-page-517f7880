@@ -95,7 +95,7 @@ All colors MUST be HSL.
   }
 
   html, body {
-    animation: bg-flashlight 30s steps(1, end) infinite;
+    animation: bg-flashlight 30s ease-in-out infinite;
   }
 
   body {
