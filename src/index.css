@@ -95,6 +95,63 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    animation: bg-flashlight 25s linear infinite;
   }
+}
+
+@keyframes bg-flashlight {
+  0%   { background-color: hsl(0 0% 0%); }       /* noir */
+  20%  { background-color: hsl(220 70% 8%); }    /* bleu très foncé */
+  40%  { background-color: hsl(150 60% 7%); }    /* vert très foncé */
+  60%  { background-color: hsl(280 60% 8%); }    /* violet très foncé */
+  80%  { background-color: hsl(30 70% 8%); }     /* orangé très foncé */
+  100% { background-color: hsl(0 0% 0%); }       /* retour noir */
+}
+
+@keyframes flashlight-pulse {
+  0%, 100% {
+    color: hsl(0 100% 50%);
+    text-shadow: 0 0 6px hsl(0 100% 50% / 0.7), 0 0 14px hsl(0 100% 50% / 0.5);
+  }
+  50% {
+    color: hsl(0 100% 70%);
+    text-shadow: 0 0 14px hsl(0 100% 60% / 1), 0 0 28px hsl(0 100% 55% / 0.9), 0 0 42px hsl(0 100% 50% / 0.7);
+  }
+}
+
+@keyframes flashlight-bg-pulse {
+  0%, 100% {
+    background-color: hsl(0 100% 50%);
+    box-shadow: 0 0 10px hsl(0 100% 50% / 0.6);
+  }
+  50% {
+    background-color: hsl(0 100% 60%);
+    box-shadow: 0 0 25px hsl(0 100% 55% / 1), 0 0 45px hsl(0 100% 50% / 0.8);
+  }
+}
+
+@keyframes flashlight-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px hsl(0 100% 50% / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px hsl(0 100% 55% / 0.9), 0 0 50px hsl(0 100% 50% / 0.6);
+  }
+}
+
+/* Tous les textes en rouge (foreground / primary / ring) clignotent comme une lampe torche */
+.text-primary,
+.text-foreground {
+  animation: flashlight-pulse 2.5s ease-in-out infinite;
+}
+
+/* Boutons / fonds rouges */
+.bg-primary {
+  animation: flashlight-bg-pulse 2.5s ease-in-out infinite;
+}
+
+/* Cartes : halo rouge pulsé */
+.bg-card {
+  animation: flashlight-glow 2.5s ease-in-out infinite;
 }
