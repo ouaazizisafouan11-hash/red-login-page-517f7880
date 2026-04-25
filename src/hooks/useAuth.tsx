@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,24 +15,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const sessionRef = useRef<Session | null>(null);
+  const manualSignOutRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
 
-    // 1. Get existing session from storage FIRST
-    supabase.auth.getSession().then(({ data: { session: existing } }) => {
+    const applySession = (nextSession: Session | null, forceClear = false) => {
       if (!mounted) return;
-      setSession(existing);
-      setUser(existing?.user ?? null);
-      setLoading(false);
+
+      if (nextSession) {
+        sessionRef.current = nextSession;
+        setSession(nextSession);
+        setUser(nextSession.user);
+        return;
+      }
+
+      if (forceClear || !sessionRef.current) {
+        sessionRef.current = null;
+        setSession(null);
+        setUser(null);
+      }
+    };
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (!mounted) return;
+
+      if (event === "SIGNED_OUT") {
+        applySession(null, manualSignOutRef.current);
+        manualSignOutRef.current = false;
+        setLoading(false);
+        return;
+      }
+
+      if (newSession) {
+        applySession(newSession);
+        setLoading(false);
+      }
     });
 
-    // 2. THEN set up listener for subsequent auth changes (sync only inside)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      if (!mounted) return;
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session: existing } }) => {
+        applySession(existing);
+        if (mounted) setLoading(false);
+      })
+      .catch(() => {
+        if (mounted) setLoading(false);
+      });
 
     return () => {
       mounted = false;
@@ -41,6 +73,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signOut = async () => {
+    manualSignOutRef.current = true;
+    sessionRef.current = null;
+    setSession(null);
+    setUser(null);
     await supabase.auth.signOut();
   };
 
