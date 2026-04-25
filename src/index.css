@@ -94,20 +94,23 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply text-foreground;
+  html {
     animation: bg-flashlight 30s steps(1, end) infinite;
+  }
+
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
 @keyframes bg-flashlight {
-  0%     { background-color: hsl(0 0% 0%); }        /* noir */
-  16.66% { background-color: hsl(0 80% 12%); }      /* rouge très foncé */
-  33.33% { background-color: hsl(220 80% 10%); }    /* bleu très foncé */
-  50%    { background-color: hsl(150 70% 8%); }     /* vert très foncé */
-  66.66% { background-color: hsl(280 70% 10%); }    /* violet très foncé */
-  83.33% { background-color: hsl(30 80% 10%); }     /* orangé très foncé */
-  100%   { background-color: hsl(0 0% 0%); }        /* retour noir */
+  0%     { --background: 0 0% 0%; }        /* noir */
+  16.66% { --background: 0 80% 12%; }      /* rouge très foncé */
+  33.33% { --background: 220 80% 10%; }    /* bleu très foncé */
+  50%    { --background: 150 70% 8%; }     /* vert très foncé */
+  66.66% { --background: 280 70% 10%; }    /* violet très foncé */
+  83.33% { --background: 30 80% 10%; }     /* orangé très foncé */
+  100%   { --background: 0 0% 0%; }        /* retour noir */
 }
 
 @keyframes flashlight-pulse {
