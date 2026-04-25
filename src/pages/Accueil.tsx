@@ -1,9 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import PersonalInfo from "@/components/PersonalInfo";
 import gojo from "@/assets/gojo.png";
-import sukuna from "@/assets/sukuna.png";
-import tanjiro from "@/assets/tanjiro.png";
-import rengoku from "@/assets/rengoku.png";
 import goku from "@/assets/goku.png";
 
 const charImgClass =
@@ -18,46 +15,22 @@ const Accueil = () => {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 py-10">
-      {/* Personnages d'anime — visibles sur toutes les tailles */}
-      <img
-        src={gojo}
-        alt="Gojo Satoru"
-        loading="lazy"
-        width={512}
-        height={896}
-        className={`${charImgClass} left-0 top-4 h-[28vh] sm:h-[40vh] xl:h-[55vh]`}
-      />
-      <img
-        src={sukuna}
-        alt="Sukuna"
-        loading="lazy"
-        width={512}
-        height={896}
-        className={`${charImgClass} right-0 top-4 h-[28vh] sm:h-[40vh] xl:h-[55vh]`}
-      />
-      <img
-        src={tanjiro}
-        alt="Tanjiro Kamado"
-        loading="lazy"
-        width={512}
-        height={896}
-        className={`${charImgClass} bottom-0 left-0 h-[24vh] sm:h-[35vh] xl:h-[45vh]`}
-      />
-      <img
-        src={rengoku}
-        alt="Kyojuro Rengoku"
-        loading="lazy"
-        width={512}
-        height={896}
-        className={`${charImgClass} bottom-0 right-0 h-[24vh] sm:h-[35vh] xl:h-[45vh]`}
-      />
+      {/* Goku à gauche, Gojo à droite */}
       <img
         src={goku}
         alt="Goku"
         loading="lazy"
         width={512}
         height={896}
-        className={`${charImgClass} bottom-0 left-1/2 h-[20vh] -translate-x-1/2 sm:h-[30vh] xl:h-[40vh]`}
+        className={`${charImgClass} left-0 bottom-0 h-[40vh] sm:h-[55vh] xl:h-[70vh]`}
+      />
+      <img
+        src={gojo}
+        alt="Gojo Satoru"
+        loading="lazy"
+        width={512}
+        height={896}
+        className={`${charImgClass} right-0 bottom-0 h-[40vh] sm:h-[55vh] xl:h-[70vh]`}
       />
 
       <div className="relative z-10 mx-auto max-w-2xl space-y-6">
