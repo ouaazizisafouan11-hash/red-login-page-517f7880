@@ -94,19 +94,29 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html, body {
+    animation: bg-flashlight 30s steps(1, end) infinite;
+  }
+
   body {
     @apply text-foreground;
-    animation: bg-flashlight 30s steps(1, end) infinite;
+  }
+
+  /* Les conteneurs de pages utilisent bg-background : on les rend transparents
+     pour laisser apparaître l'animation du <html>/<body> */
+  main.bg-background,
+  .bg-background {
+    background-color: transparent !important;
   }
 }
 
 @keyframes bg-flashlight {
   0%     { background-color: hsl(0 0% 0%); }        /* noir */
-  16.66% { background-color: hsl(0 80% 12%); }      /* rouge très foncé */
-  33.33% { background-color: hsl(220 80% 10%); }    /* bleu très foncé */
-  50%    { background-color: hsl(150 70% 8%); }     /* vert très foncé */
-  66.66% { background-color: hsl(280 70% 10%); }    /* violet très foncé */
-  83.33% { background-color: hsl(30 80% 10%); }     /* orangé très foncé */
+  16.66% { background-color: hsl(0 80% 15%); }      /* rouge foncé */
+  33.33% { background-color: hsl(220 85% 14%); }    /* bleu foncé */
+  50%    { background-color: hsl(150 75% 11%); }    /* vert foncé */
+  66.66% { background-color: hsl(280 75% 14%); }    /* violet foncé */
+  83.33% { background-color: hsl(30 85% 13%); }     /* orangé foncé */
   100%   { background-color: hsl(0 0% 0%); }        /* retour noir */
 }
 
