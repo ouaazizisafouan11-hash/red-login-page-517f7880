@@ -80,28 +80,27 @@ export default {
             height: "0",
           },
         },
-        "jump-spin": {
+        "soft-reveal": {
           "0%": {
             opacity: "0",
-            transform: "translateY(60px) scale(0.85) rotate(0deg)",
+            transform: "translateY(20px)",
+            filter: "blur(8px)",
           },
-          "40%": {
+          "60%": {
             opacity: "1",
-            transform: "translateY(-30px) scale(1.05) rotate(180deg)",
-          },
-          "70%": {
-            transform: "translateY(10px) scale(0.98) rotate(360deg)",
+            filter: "blur(0px)",
           },
           "100%": {
             opacity: "1",
-            transform: "translateY(0) scale(1) rotate(360deg)",
+            transform: "translateY(0)",
+            filter: "blur(0px)",
           },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "jump-spin": "jump-spin 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
+        "soft-reveal": "soft-reveal 0.7s ease-out both",
       },
     },
   },
