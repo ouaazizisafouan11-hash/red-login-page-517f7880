@@ -31,7 +31,10 @@ const PersonalInfo = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     const load = async () => {
       const { data } = await supabase
         .from("profiles")
