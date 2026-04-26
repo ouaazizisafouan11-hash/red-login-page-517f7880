@@ -1,10 +1,29 @@
 import { useEffect, useState } from "react";
 import { Pencil, Save, X } from "lucide-react";
 import PersonalInfo from "@/components/PersonalInfo";
+import { useInView } from "@/hooks/useInView";
 
 const DEFAULT_WELCOME =
   "I'm honored to meet you. My name is Adnane Aziz, and this is my very first web project. I hope you enjoy it.";
 const STORAGE_KEY = "welcome_message";
+
+const AnimatedSection = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  const { ref, inView } = useInView<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`${className} ${inView ? "animate-jump-spin opacity-100" : "opacity-0"}`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Index = () => {
   const text = "I'm the best in coding";
@@ -40,7 +59,7 @@ const Index = () => {
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
-      <section className="flex min-h-[60vh] items-center justify-center">
+      <AnimatedSection className="flex min-h-[60vh] items-center justify-center">
         <h1
           className="text-center text-4xl font-extrabold tracking-tight text-primary sm:text-6xl md:text-7xl"
           aria-label={text}
@@ -58,10 +77,13 @@ const Index = () => {
             </span>
           ))}
         </h1>
-      </section>
+      </AnimatedSection>
 
-      <section className="mx-auto mb-10 max-w-3xl">
-        <div className="relative rounded-lg bg-card p-6 sm:p-8" style={{ boxShadow: "var(--shadow-glow)" }}>
+      <AnimatedSection className="mx-auto mb-10 max-w-3xl">
+        <div
+          className="relative rounded-lg bg-card p-6 sm:p-8"
+          style={{ boxShadow: "var(--shadow-glow)" }}
+        >
           <div className="mb-4 flex justify-end">
             {!editing ? (
               <button
@@ -89,7 +111,7 @@ const Index = () => {
           </div>
 
           {!editing ? (
-            <p className="animate-fade-in text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
+            <p className="text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
               {welcome}
             </p>
           ) : (
@@ -102,11 +124,11 @@ const Index = () => {
             />
           )}
         </div>
-      </section>
+      </AnimatedSection>
 
-      <section className="mx-auto max-w-2xl space-y-6">
+      <AnimatedSection className="mx-auto max-w-2xl">
         <PersonalInfo />
-      </section>
+      </AnimatedSection>
     </main>
   );
 };
