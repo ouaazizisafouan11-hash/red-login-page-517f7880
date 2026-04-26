@@ -25,6 +25,12 @@ const Index = () => {
         </h1>
       </section>
 
+      <section className="mx-auto mb-10 max-w-2xl">
+        <p className="animate-fade-in text-center text-lg leading-relaxed text-accent sm:text-xl">
+          I'm honored to meet you. My name is Adnane Aziz, and this is my very first web project. I hope you enjoy it.
+        </p>
+      </section>
+
       <section className="mx-auto max-w-2xl space-y-6">
         <PersonalInfo />
       </section>
