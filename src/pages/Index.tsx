@@ -18,7 +18,7 @@ const AnimatedSection = ({
   return (
     <div
       ref={ref}
-      className={`${className} ${inView ? "animate-jump-spin opacity-100" : "opacity-0"}`}
+      className={`${className} ${inView ? "animate-soft-reveal opacity-100" : "opacity-0"}`}
     >
       {children}
     </div>
