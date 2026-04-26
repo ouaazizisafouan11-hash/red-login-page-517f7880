@@ -8,6 +8,7 @@ interface ProfileData {
   first_name: string | null;
   last_name: string | null;
   age: number | null;
+  email: string | null;
   phone: string | null;
   address: string | null;
   description: string | null;
@@ -17,73 +18,112 @@ const emptyProfile: ProfileData = {
   first_name: "",
   last_name: "",
   age: null,
+  email: "",
   phone: "",
   address: "",
   description: "",
 };
 
+const LOCAL_KEY = "personal_info_local";
+
 const PersonalInfo = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState<ProfileData>(emptyProfile);
   const [draft, setDraft] = useState<ProfileData>(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
     const load = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("first_name, last_name, age, phone, address, description")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      setProfile(data ?? emptyProfile);
-      setDraft(data ?? emptyProfile);
+      // If logged in, load from Supabase
+      if (user) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("first_name, last_name, age, phone, address, description")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        const loaded: ProfileData = {
+          first_name: data?.first_name ?? "",
+          last_name: data?.last_name ?? "",
+          age: data?.age ?? null,
+          email: user.email ?? "",
+          phone: data?.phone ?? "",
+          address: data?.address ?? "",
+          description: data?.description ?? "",
+        };
+        setProfile(loaded);
+        setDraft(loaded);
+      } else {
+        // Otherwise, load from localStorage
+        const raw = localStorage.getItem(LOCAL_KEY);
+        if (raw) {
+          try {
+            const parsed = { ...emptyProfile, ...JSON.parse(raw) } as ProfileData;
+            setProfile(parsed);
+            setDraft(parsed);
+          } catch {
+            // ignore
+          }
+        }
+      }
       setLoading(false);
     };
     load();
   }, [user]);
 
   const startEdit = () => {
-    setDraft(profile ?? emptyProfile);
+    setDraft(profile);
     setEditing(true);
   };
 
   const cancelEdit = () => {
-    setDraft(profile ?? emptyProfile);
+    setDraft(profile);
     setEditing(false);
   };
 
   const handleSave = async () => {
-    if (!user) return;
     setSaving(true);
-    const payload = {
-      user_id: user.id,
+
+    const cleaned: ProfileData = {
       first_name: draft.first_name?.trim() || null,
       last_name: draft.last_name?.trim() || null,
-      age: draft.age === null || draft.age === undefined || (draft.age as any) === "" ? null : Number(draft.age),
+      age:
+        draft.age === null || draft.age === undefined || (draft.age as any) === ""
+          ? null
+          : Number(draft.age),
+      email: draft.email?.trim() || null,
       phone: draft.phone?.trim() || null,
       address: draft.address?.trim() || null,
       description: draft.description?.trim() || null,
     };
 
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(payload, { onConflict: "user_id" });
-
-    setSaving(false);
-
-    if (error) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
-      return;
+    if (user) {
+      const { error } = await supabase.from("profiles").upsert(
+        {
+          user_id: user.id,
+          first_name: cleaned.first_name,
+          last_name: cleaned.last_name,
+          age: cleaned.age,
+          phone: cleaned.phone,
+          address: cleaned.address,
+          description: cleaned.description,
+        },
+        { onConflict: "user_id" }
+      );
+      if (error) {
+        setSaving(false);
+        toast({ title: "Erreur", description: error.message, variant: "destructive" });
+        return;
+      }
+    } else {
+      // Save locally
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(cleaned));
     }
 
-    setProfile(payload as ProfileData);
+    setProfile(cleaned);
     setEditing(false);
+    setSaving(false);
     toast({ title: "Enregistré", description: "Vos informations ont été mises à jour." });
   };
 
@@ -95,7 +135,7 @@ const PersonalInfo = () => {
     );
   }
 
-  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
+  const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(" ");
 
   const inputClass =
     "mt-1 w-full rounded-md bg-input px-3 py-2 text-accent placeholder:text-accent/60 focus:outline-none focus:ring-2 focus:ring-ring";
@@ -142,22 +182,22 @@ const PersonalInfo = () => {
             <li className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-primary" />
               <span className="text-accent">Âge :</span>
-              <span>{profile?.age ?? "Non renseigné"}</span>
+              <span>{profile.age ?? "Non renseigné"}</span>
             </li>
             <li className="flex items-center gap-3">
               <Mail className="h-4 w-4 text-primary" />
               <span className="text-accent">Email :</span>
-              <span className="break-all">{user?.email}</span>
+              <span className="break-all">{profile.email || "Non renseigné"}</span>
             </li>
             <li className="flex items-center gap-3">
               <Phone className="h-4 w-4 text-primary" />
               <span className="text-accent">Téléphone :</span>
-              <span>{profile?.phone || "Non renseigné"}</span>
+              <span>{profile.phone || "Non renseigné"}</span>
             </li>
             <li className="flex items-start gap-3">
               <MapPin className="mt-1 h-4 w-4 text-primary" />
               <span className="text-accent">Adresse :</span>
-              <span className="whitespace-pre-wrap">{profile?.address || "Non renseignée"}</span>
+              <span className="whitespace-pre-wrap">{profile.address || "Non renseignée"}</span>
             </li>
           </ul>
         ) : (
@@ -194,6 +234,16 @@ const PersonalInfo = () => {
               />
             </label>
             <label className="text-sm">
+              <span className="text-accent">Email</span>
+              <input
+                type="email"
+                className={inputClass}
+                value={draft.email ?? ""}
+                onChange={(e) => setDraft({ ...draft, email: e.target.value })}
+                placeholder="exemple@mail.com"
+              />
+            </label>
+            <label className="text-sm">
               <span className="text-accent">Téléphone</span>
               <input
                 className={inputClass}
@@ -220,7 +270,7 @@ const PersonalInfo = () => {
         <h2 className="mb-3 text-xl font-bold text-primary">Bio</h2>
         {!editing ? (
           <p className="whitespace-pre-wrap text-accent">
-            {profile?.description || "Aucune bio renseignée."}
+            {profile.description || "Aucune bio renseignée."}
           </p>
         ) : (
           <textarea
