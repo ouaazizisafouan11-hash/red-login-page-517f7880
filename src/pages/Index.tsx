@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Pencil, Save, X } from "lucide-react";
 import PersonalInfo from "@/components/PersonalInfo";
 import { useInView } from "@/hooks/useInView";
 
