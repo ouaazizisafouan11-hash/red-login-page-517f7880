@@ -122,7 +122,7 @@ const PersonalInfo = () => {
       );
       if (error) {
         setSaving(false);
-        toast({ title: "Erreur", description: error.message, variant: "destructive" });
+        toast.error("Erreur", { description: error.message });
         return;
       }
     } else {
@@ -133,7 +133,7 @@ const PersonalInfo = () => {
     setProfile(cleaned);
     setEditing(false);
     setSaving(false);
-    toast({ title: "Enregistré", description: "Vos informations ont été mises à jour." });
+    toast.success("Enregistré", { description: "Vos informations ont été mises à jour." });
   };
 
   if (loading) {
