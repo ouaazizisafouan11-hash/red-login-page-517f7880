@@ -1,5 +1,8 @@
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import PersonalInfo from "@/components/PersonalInfo";
 import { useInView } from "@/hooks/useInView";
+import { useAuth } from "@/hooks/useAuth";
 
 const WELCOME =
   "I'm honored to meet you. My name is Adnane ouaazizi, and this is my first web project. I hope you enjoy it.";
@@ -25,9 +28,22 @@ const AnimatedSection = ({
 const Index = () => {
   const text = "I'm the best in coding";
   const welcome = WELCOME;
+  const { user, signOut } = useAuth();
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
+      <div className="mb-6 flex justify-end">
+        {user ? (
+          <Button onClick={signOut} variant="outline">
+            Sign Out
+          </Button>
+        ) : (
+          <Button asChild>
+            <Link to="/auth">Sign In</Link>
+          </Button>
+        )}
+      </div>
+
       <AnimatedSection className="flex min-h-[60vh] items-center justify-center">
         <h1
           className="text-center text-4xl font-extrabold tracking-tight text-primary sm:text-6xl md:text-7xl"
