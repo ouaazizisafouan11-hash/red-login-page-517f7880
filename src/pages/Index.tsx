@@ -1,5 +1,8 @@
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import PersonalInfo from "@/components/PersonalInfo";
 import { useInView } from "@/hooks/useInView";
+import { useAuth } from "@/hooks/useAuth";
 
 const WELCOME =
   "I'm honored to meet you. My name is Adnane ouaazizi, and this is my first web project. I hope you enjoy it.";
