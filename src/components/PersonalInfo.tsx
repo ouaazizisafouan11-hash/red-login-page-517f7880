@@ -75,6 +75,14 @@ const PersonalInfo = () => {
   }, [user]);
 
   const startEdit = () => {
+    if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter avec Google pour modifier vos informations.",
+      });
+      navigate("/auth");
+      return;
+    }
     setDraft(profile);
     setEditing(true);
   };
