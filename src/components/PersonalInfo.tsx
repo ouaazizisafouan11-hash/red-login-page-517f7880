@@ -29,6 +29,7 @@ const LOCAL_KEY = "personal_info_local";
 
 const PersonalInfo = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData>(emptyProfile);
   const [draft, setDraft] = useState<ProfileData>(emptyProfile);
   const [loading, setLoading] = useState(true);
