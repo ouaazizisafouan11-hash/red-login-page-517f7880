@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
 import PersonalInfo from "@/components/PersonalInfo";
 import { useInView } from "@/hooks/useInView";
 
-const DEFAULT_WELCOME =
+const WELCOME =
   "I'm honored to meet you. My name is Adnane ouaazizi, and this is my first web project. I hope you enjoy it.";
-const STORAGE_KEY = "welcome_message";
 
 const AnimatedSection = ({
   children,
@@ -26,15 +24,7 @@ const AnimatedSection = ({
 
 const Index = () => {
   const text = "I'm the best in coding";
-
-  const [welcome, setWelcome] = useState<string>(DEFAULT_WELCOME);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setWelcome(saved);
-    }
-  }, []);
+  const welcome = WELCOME;
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
