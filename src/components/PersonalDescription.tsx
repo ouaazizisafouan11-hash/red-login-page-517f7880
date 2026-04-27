@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const PersonalDescription = () => {
   const { user } = useAuth();
@@ -22,7 +22,7 @@ const PersonalDescription = () => {
         .maybeSingle();
 
       if (error) {
-        toast({ title: "Erreur de chargement", description: error.message, variant: "destructive" });
+        toast.error("Erreur de chargement", { description: error.message });
       } else {
         setDescription(data?.description ?? "");
       }
@@ -49,11 +49,11 @@ const PersonalDescription = () => {
       .upsert({ user_id: user.id, description: draft }, { onConflict: "user_id" });
 
     if (error) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      toast.error("Erreur", { description: error.message });
     } else {
       setDescription(draft);
       setEditing(false);
-      toast({ title: "Enregistré", description: "Votre description a été mise à jour." });
+      toast.success("Enregistré", { description: "Votre description a été mise à jour." });
     }
     setSaving(false);
   };

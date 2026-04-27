@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -31,14 +31,14 @@ const Auth = () => {
           options: { emailRedirectTo: `${window.location.origin}/accueil` },
         });
         if (error) throw error;
-        toast({ title: "Compte créé", description: "Vérifiez votre email pour confirmer." });
+        toast.success("Compte créé", { description: "Vérifiez votre email pour confirmer." });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         navigate("/accueil", { replace: true });
       }
     } catch (err: any) {
-      toast({ title: "Erreur", description: err.message, variant: "destructive" });
+      toast.error("Erreur", { description: err.message });
     } finally {
       setLoading(false);
     }
@@ -51,14 +51,14 @@ const Auth = () => {
         redirect_uri: `${window.location.origin}/accueil`,
       });
       if (result.error) {
-        toast({ title: "Erreur Google", description: result.error.message, variant: "destructive" });
+        toast.error("Erreur Google", { description: result.error.message });
         setLoading(false);
         return;
       }
       if (result.redirected) return;
       navigate("/accueil", { replace: true });
     } catch (err: any) {
-      toast({ title: "Erreur", description: err.message, variant: "destructive" });
+      toast.error("Erreur", { description: err.message });
       setLoading(false);
     }
   };

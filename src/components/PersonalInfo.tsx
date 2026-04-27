@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Mail, Phone, MapPin, User, Calendar, Pencil, Save, X } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface ProfileData {
   first_name: string | null;
@@ -76,8 +76,7 @@ const PersonalInfo = () => {
 
   const startEdit = () => {
     if (!user) {
-      toast({
-        title: "Connexion requise",
+      toast("Connexion requise", {
         description: "Veuillez vous connecter avec Google pour modifier vos informations.",
       });
       navigate("/auth");
@@ -123,7 +122,7 @@ const PersonalInfo = () => {
       );
       if (error) {
         setSaving(false);
-        toast({ title: "Erreur", description: error.message, variant: "destructive" });
+        toast.error("Erreur", { description: error.message });
         return;
       }
     } else {
@@ -134,7 +133,7 @@ const PersonalInfo = () => {
     setProfile(cleaned);
     setEditing(false);
     setSaving(false);
-    toast({ title: "Enregistré", description: "Vos informations ont été mises à jour." });
+    toast.success("Enregistré", { description: "Vos informations ont été mises à jour." });
   };
 
   if (loading) {

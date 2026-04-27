@@ -33,7 +33,7 @@ const Index = () => {
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-extrabold tracking-tight text-primary sm:text-3xl">
+        <h2 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-3xl font-extrabold tracking-tight text-transparent drop-shadow-sm sm:text-5xl md:text-6xl">
           Adnane The King
         </h2>
         {user ? (
