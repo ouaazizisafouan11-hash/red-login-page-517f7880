@@ -28,33 +28,13 @@ const Index = () => {
   const text = "I'm the best in coding";
 
   const [welcome, setWelcome] = useState<string>(DEFAULT_WELCOME);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState<string>(DEFAULT_WELCOME);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       setWelcome(saved);
-      setDraft(saved);
     }
   }, []);
-
-  const startEdit = () => {
-    setDraft(welcome);
-    setEditing(true);
-  };
-
-  const cancelEdit = () => {
-    setDraft(welcome);
-    setEditing(false);
-  };
-
-  const saveEdit = () => {
-    const value = draft.trim() || DEFAULT_WELCOME;
-    setWelcome(value);
-    localStorage.setItem(STORAGE_KEY, value);
-    setEditing(false);
-  };
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
