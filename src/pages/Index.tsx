@@ -4,7 +4,7 @@ import PersonalInfo from "@/components/PersonalInfo";
 import { useInView } from "@/hooks/useInView";
 
 const DEFAULT_WELCOME =
-  "I'm honored to meet you. My name is Adnane Aziz, and this is my very first web project. I hope you enjoy it.";
+  "I'm honored to meet you. My name is Adnane ouaazizi, and this is my first web project. I hope you enjoy it.";
 const STORAGE_KEY = "welcome_message";
 
 const AnimatedSection = ({
@@ -84,45 +84,9 @@ const Index = () => {
           className="relative rounded-lg bg-card p-6 sm:p-8"
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
-          <div className="mb-4 flex justify-end">
-            {!editing ? (
-              <button
-                onClick={startEdit}
-                className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground hover:bg-primary/80"
-              >
-                <Pencil className="h-3.5 w-3.5" /> Modifier
-              </button>
-            ) : (
-              <div className="flex gap-2">
-                <button
-                  onClick={cancelEdit}
-                  className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm text-accent hover:bg-muted"
-                >
-                  <X className="h-3.5 w-3.5" /> Annuler
-                </button>
-                <button
-                  onClick={saveEdit}
-                  className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground hover:bg-primary/80"
-                >
-                  <Save className="h-3.5 w-3.5" /> Enregistrer
-                </button>
-              </div>
-            )}
-          </div>
-
-          {!editing ? (
-            <p className="text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
-              {welcome}
-            </p>
-          ) : (
-            <textarea
-              autoFocus
-              rows={5}
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              className="w-full rounded-md bg-input px-4 py-3 text-center text-2xl font-semibold leading-relaxed text-accent placeholder:text-accent/60 focus:outline-none focus:ring-2 focus:ring-ring sm:text-3xl"
-            />
-          )}
+          <p className="text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
+            {welcome}
+          </p>
         </div>
       </AnimatedSection>
 
