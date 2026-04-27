@@ -76,8 +76,7 @@ const PersonalInfo = () => {
 
   const startEdit = () => {
     if (!user) {
-      toast({
-        title: "Connexion requise",
+      toast("Connexion requise", {
         description: "Veuillez vous connecter avec Google pour modifier vos informations.",
       });
       navigate("/auth");
