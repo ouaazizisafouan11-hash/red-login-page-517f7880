@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Mail, Phone, MapPin, User, Calendar, Pencil, Save, X } from "lucide-react";
@@ -28,6 +29,7 @@ const LOCAL_KEY = "personal_info_local";
 
 const PersonalInfo = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData>(emptyProfile);
   const [draft, setDraft] = useState<ProfileData>(emptyProfile);
   const [loading, setLoading] = useState(true);
@@ -73,6 +75,14 @@ const PersonalInfo = () => {
   }, [user]);
 
   const startEdit = () => {
+    if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter avec Google pour modifier vos informations.",
+      });
+      navigate("/auth");
+      return;
+    }
     setDraft(profile);
     setEditing(true);
   };

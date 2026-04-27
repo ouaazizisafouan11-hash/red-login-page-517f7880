@@ -32,7 +32,10 @@ const Index = () => {
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
-      <div className="mb-6 flex justify-end">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-extrabold tracking-tight text-primary sm:text-3xl">
+          Adnane The King
+        </h2>
         {user ? (
           <Button onClick={signOut} variant="outline">
             Sign Out
