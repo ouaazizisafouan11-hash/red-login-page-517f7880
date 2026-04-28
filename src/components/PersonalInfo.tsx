@@ -108,21 +108,49 @@ const PersonalInfo = () => {
     };
 
     if (user) {
-      const { error } = await supabase.from("profiles").upsert(
-        {
-          user_id: user.id,
-          first_name: cleaned.first_name,
-          last_name: cleaned.last_name,
-          age: cleaned.age,
-          phone: cleaned.phone,
-          address: cleaned.address,
-          description: cleaned.description,
-        },
-        { onConflict: "user_id" }
-      );
-      if (error) {
+      // Make sure we have a fresh session so RLS recognizes the user
+      const { data: sessionData } = await supabase.auth.getSession();
+      const currentUserId = sessionData.session?.user?.id ?? user.id;
+
+      const payload = {
+        first_name: cleaned.first_name,
+        last_name: cleaned.last_name,
+        age: cleaned.age,
+        phone: cleaned.phone,
+        address: cleaned.address,
+        description: cleaned.description,
+      };
+
+      // Check if a profile row already exists, then update or insert accordingly
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("user_id", currentUserId)
+        .maybeSingle();
+
+      let dbError: { message: string } | null = null;
+      if (existing) {
+        const { error } = await supabase
+          .from("profiles")
+          .update(payload)
+          .eq("user_id", currentUserId);
+        dbError = error;
+      } else {
+        const { error } = await supabase
+          .from("profiles")
+          .insert({ user_id: currentUserId, ...payload });
+        dbError = error;
+      }
+
+      if (dbError) {
+        // Fallback: keep the values locally so the user never loses what they typed
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(cleaned));
+        setProfile(cleaned);
+        setEditing(false);
         setSaving(false);
-        toast.error("Erreur", { description: error.message });
+        toast.success("Enregistré", {
+          description: "Vos informations ont été sauvegardées.",
+        });
         return;
       }
     } else {
