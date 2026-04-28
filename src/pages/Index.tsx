@@ -37,11 +37,11 @@ const Index = () => {
           Adnane The King
         </h2>
         {user ? (
-          <Button onClick={signOut} variant="outline">
+          <Button onClick={signOut} variant="outline" size="sm" className="h-7 px-2 text-xs">
             Sign Out
           </Button>
         ) : (
-          <Button asChild>
+          <Button asChild size="sm" className="h-7 px-2 text-xs">
             <Link to="/auth">Sign In</Link>
           </Button>
         )}
@@ -49,7 +49,7 @@ const Index = () => {
 
       <AnimatedSection className="flex min-h-[60vh] items-center justify-center">
         <h1
-          className="text-center text-4xl font-extrabold tracking-tight text-primary sm:text-6xl md:text-7xl"
+          className="text-center text-xl font-extrabold tracking-tight text-primary sm:text-2xl md:text-3xl"
           aria-label={text}
         >
           {text.split("").map((char, i) => (
