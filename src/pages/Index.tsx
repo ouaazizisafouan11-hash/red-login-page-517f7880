@@ -33,15 +33,15 @@ const Index = () => {
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-3xl font-extrabold tracking-tight text-transparent drop-shadow-sm sm:text-5xl md:text-6xl">
+        <h2 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-2xl font-extrabold tracking-tight text-transparent drop-shadow-sm sm:text-3xl md:text-4xl">
           Adnane The King
         </h2>
         {user ? (
-          <Button onClick={signOut} variant="outline" size="sm" className="h-7 px-2 text-xs">
+          <Button onClick={signOut} variant="outline" size="sm" className="h-8 px-3 text-xs sm:text-sm">
             Sign Out
           </Button>
         ) : (
-          <Button asChild size="sm" className="h-7 px-2 text-xs">
+          <Button asChild size="sm" className="h-8 px-3 text-xs sm:text-sm">
             <Link to="/auth">Sign In</Link>
           </Button>
         )}
@@ -49,7 +49,7 @@ const Index = () => {
 
       <AnimatedSection className="flex min-h-[60vh] items-center justify-center">
         <h1
-          className="text-center text-xl font-extrabold tracking-tight text-primary sm:text-2xl md:text-3xl"
+          className="text-center text-2xl font-extrabold tracking-tight text-primary sm:text-3xl md:text-4xl"
           aria-label={text}
         >
           {text.split("").map((char, i) => (
