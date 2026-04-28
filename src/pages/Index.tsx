@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import PersonalInfo from "@/components/PersonalInfo";
+import OwnerInfo from "@/components/OwnerInfo";
 import { useInView } from "@/hooks/useInView";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -79,7 +79,7 @@ const Index = () => {
       </AnimatedSection>
 
       <AnimatedSection className="mx-auto max-w-2xl">
-        <PersonalInfo />
+        <OwnerInfo />
       </AnimatedSection>
     </main>
   );
