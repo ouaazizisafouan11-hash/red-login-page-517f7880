@@ -21,7 +21,7 @@ const Accueil = () => {
           </div>
           <button
             onClick={signOut}
-            className="rounded-md bg-primary px-4 py-2 font-bold text-primary-foreground transition-colors hover:bg-primary/80"
+            className="rounded border border-border bg-background px-1 py-px text-[7px] leading-none text-muted-foreground hover:bg-muted"
           >
             Déconnexion
           </button>
