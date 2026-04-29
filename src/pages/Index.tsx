@@ -37,8 +37,8 @@ const Index = () => {
           Adnane The King
         </h2>
         {user ? (
-          <Button onClick={signOut} variant="outline" size="sm" className="h-5 px-1.5 text-[9px]">
-            Sign Out
+          <Button onClick={signOut} variant="outline" size="sm" className="h-4 px-1 text-[8px] leading-none">
+            Déconnecter
           </Button>
         ) : (
           <Button asChild className="h-10 px-5 text-sm sm:h-11 sm:px-6 sm:text-base">
