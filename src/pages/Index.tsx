@@ -37,11 +37,11 @@ const Index = () => {
           Adnane The King
         </h2>
         {user ? (
-          <Button onClick={signOut} variant="outline" size="sm" className="h-8 px-3 text-xs sm:text-sm">
+          <Button onClick={signOut} variant="outline" size="sm" className="h-6 px-2 text-[10px] sm:text-xs">
             Sign Out
           </Button>
         ) : (
-          <Button asChild size="sm" className="h-8 px-3 text-xs sm:text-sm">
+          <Button asChild size="sm" className="h-6 px-2 text-[10px] sm:text-xs">
             <Link to="/auth">Sign In</Link>
           </Button>
         )}
