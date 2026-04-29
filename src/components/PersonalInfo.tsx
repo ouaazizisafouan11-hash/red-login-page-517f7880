@@ -37,22 +37,40 @@ const PersonalInfo = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     const load = async () => {
       // If logged in, load from Supabase
       if (user) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("profiles")
           .select("first_name, last_name, age, phone, address, description")
           .eq("user_id", user.id)
           .maybeSingle();
+
+        if (cancelled) return;
+
+        // If query failed (e.g. transient auth/token issue), don't wipe existing values
+        if (error) {
+          setLoading(false);
+          return;
+        }
+
+        // If no row exists yet, keep whatever is already in state (don't wipe to empty)
+        if (!data) {
+          setProfile((prev) => ({ ...prev, email: user.email ?? prev.email ?? "" }));
+          setDraft((prev) => ({ ...prev, email: user.email ?? prev.email ?? "" }));
+          setLoading(false);
+          return;
+        }
+
         const loaded: ProfileData = {
-          first_name: data?.first_name ?? "",
-          last_name: data?.last_name ?? "",
-          age: data?.age ?? null,
+          first_name: data.first_name ?? "",
+          last_name: data.last_name ?? "",
+          age: data.age ?? null,
           email: user.email ?? "",
-          phone: data?.phone ?? "",
-          address: data?.address ?? "",
-          description: data?.description ?? "",
+          phone: data.phone ?? "",
+          address: data.address ?? "",
+          description: data.description ?? "",
         };
         setProfile(loaded);
         setDraft(loaded);
@@ -62,17 +80,22 @@ const PersonalInfo = () => {
         if (raw) {
           try {
             const parsed = { ...emptyProfile, ...JSON.parse(raw) } as ProfileData;
-            setProfile(parsed);
-            setDraft(parsed);
+            if (!cancelled) {
+              setProfile(parsed);
+              setDraft(parsed);
+            }
           } catch {
             // ignore
           }
         }
       }
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     };
     load();
-  }, [user]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const startEdit = () => {
     if (!user) {
