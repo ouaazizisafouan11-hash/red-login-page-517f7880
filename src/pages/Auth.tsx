@@ -17,6 +17,10 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Clear manual sign-out flag so a new login is honored
+    try {
+      localStorage.removeItem("manual_signed_out");
+    } catch {}
     if (user) navigate("/accueil", { replace: true });
   }, [user, navigate]);
 
