@@ -21,10 +21,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
+    const wasManualSignOut = () => {
+      try {
+        return localStorage.getItem("manual_signed_out") === "1";
+      } catch {
+        return false;
+      }
+    };
+
+    const clearManualFlag = () => {
+      try {
+        localStorage.removeItem("manual_signed_out");
+      } catch {}
+    };
+
     const applySession = (nextSession: Session | null, forceClear = false) => {
       if (!mounted) return;
 
       if (nextSession) {
+        if (wasManualSignOut()) {
+          supabase.auth.signOut().catch(() => {});
+          sessionRef.current = null;
+          setSession(null);
+          setUser(null);
+          return;
+        }
         sessionRef.current = nextSession;
         setSession(nextSession);
         setUser(nextSession.user);
@@ -48,6 +69,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         manualSignOutRef.current = false;
         setLoading(false);
         return;
+      }
+
+      if (event === "SIGNED_IN") {
+        clearManualFlag();
       }
 
       if (newSession) {
@@ -74,6 +99,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     manualSignOutRef.current = true;
+    try {
+      localStorage.setItem("manual_signed_out", "1");
+    } catch {}
     sessionRef.current = null;
     setSession(null);
     setUser(null);
