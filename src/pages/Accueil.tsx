@@ -21,7 +21,7 @@ const Accueil = () => {
           </div>
           <button
             onClick={signOut}
-            className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground hover:bg-primary/80"
+            className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground hover:bg-primary/80"
           >
             Déconnexion
           </button>
