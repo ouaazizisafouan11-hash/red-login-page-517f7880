@@ -1,1 +1,4 @@
 project_id = "rrqmjaumqnmqdmqsjgrm"
+
+[functions.game-designer]
+verify_jwt = false
