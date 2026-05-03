@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import OwnerInfo from "@/components/OwnerInfo";
 import { useInView } from "@/hooks/useInView";
-import { useAuth } from "@/hooks/useAuth";
 
 const WELCOME =
   "I'm honored to meet you. My name is Adnane ouaazizi, and this is my first web project. I hope you enjoy it.";
@@ -27,8 +25,6 @@ const AnimatedSection = ({
 
 const Index = () => {
   const text = "I'm the best in coding";
-  const welcome = WELCOME;
-  const { user, signOut } = useAuth();
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
@@ -36,21 +32,12 @@ const Index = () => {
         <h2 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-2xl font-extrabold tracking-tight text-transparent drop-shadow-sm sm:text-3xl md:text-4xl">
           Adnane The King
         </h2>
-        {user ? (
-          <button
-            onClick={signOut}
-            className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground hover:bg-primary/80"
-          >
-            Déconnexion
-          </button>
-        ) : (
-          <Button asChild className="h-10 px-5 text-sm sm:h-11 sm:px-6 sm:text-base">
-            <Link to="/auth">Sign In</Link>
-          </Button>
-        )}
+        <Button asChild className="h-10 px-5 text-sm sm:h-11 sm:px-6 sm:text-base">
+          <Link to="/chat">Entrer 🎮</Link>
+        </Button>
       </div>
 
-      <AnimatedSection className="flex min-h-[60vh] items-center justify-center">
+      <AnimatedSection className="flex min-h-[40vh] items-center justify-center">
         <h1
           className="text-center text-2xl font-extrabold tracking-tight text-primary sm:text-3xl md:text-4xl"
           aria-label={text}
@@ -76,13 +63,21 @@ const Index = () => {
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
           <p className="text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
-            {welcome}
+            {WELCOME}
           </p>
         </div>
       </AnimatedSection>
 
-      <AnimatedSection className="mx-auto max-w-2xl">
-        <OwnerInfo />
+      <AnimatedSection className="mx-auto max-w-2xl text-center">
+        <Link
+          to="/chat"
+          className="inline-block rounded-lg bg-primary px-8 py-4 text-lg font-bold text-primary-foreground hover:bg-primary/80"
+        >
+          🎮 Parler à l'IA conceptrice de jeux
+        </Link>
+        <p className="mt-3 text-sm text-accent">
+          Aucun email, aucune inscription. Entre directement et décris le jeu de tes rêves.
+        </p>
       </AnimatedSection>
     </main>
   );
