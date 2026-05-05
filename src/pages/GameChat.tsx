@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
+import { LogOut } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/game-designer`;
 
 const GameChat = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
@@ -108,13 +111,19 @@ const GameChat = () => {
 
   return (
     <main className="flex min-h-screen flex-col px-4 py-6">
-      <header className="mb-4 text-center">
-        <h1 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-2xl font-extrabold tracking-tight text-transparent sm:text-3xl">
+      <header className="mx-auto mb-4 flex w-full max-w-3xl items-center justify-between gap-2">
+        <h1 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-lg font-extrabold tracking-tight text-transparent sm:text-xl">
           🎮 AI Game Designer
         </h1>
-        <p className="mt-1 text-xs text-accent sm:text-sm">
-          Décris ton jeu de rêve. L'IA te livre un design adapté à ton niveau (de quelques minutes jusqu'à 3 jours pour un GDD pro).
-        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/")}
+          className="gap-1.5"
+        >
+          <LogOut className="h-4 w-4" />
+          Quitter
+        </Button>
       </header>
 
       <div
