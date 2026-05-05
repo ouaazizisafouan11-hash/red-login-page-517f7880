@@ -21,12 +21,12 @@ All colors MUST be HSL.
     --primary-foreground: 0 0% 0%;
 
     --secondary: 0 0% 13%;
-    --secondary-foreground: 195 90% 75%;
+    --secondary-foreground: 220 95% 80%;
 
     --muted: 0 0% 13%;
-    --muted-foreground: 195 80% 80%;
+    --muted-foreground: 220 85% 82%;
 
-    --accent: 195 90% 75%;
+    --accent: 220 95% 80%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84.2% 60.2%;
