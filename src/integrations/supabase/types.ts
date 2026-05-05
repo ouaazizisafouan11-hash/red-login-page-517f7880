@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      games: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          estimated_minutes: number | null
+          html_code: string | null
+          id: string
+          prompt: string
+          session_id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          estimated_minutes?: number | null
+          html_code?: string | null
+          id?: string
+          prompt: string
+          session_id: string
+          status?: string
+          title: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          estimated_minutes?: number | null
+          html_code?: string | null
+          id?: string
+          prompt?: string
+          session_id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       owner_info: {
         Row: {
           address: string | null
