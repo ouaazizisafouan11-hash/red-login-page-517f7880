@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import GameChat from "./pages/GameChat.tsx";
+import GameLibrary from "./pages/GameLibrary.tsx";
+import GamePlay from "./pages/GamePlay.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -18,6 +20,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/chat" element={<GameChat />} />
+          <Route path="/games" element={<GameLibrary />} />
+          <Route path="/play/:id" element={<GamePlay />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
