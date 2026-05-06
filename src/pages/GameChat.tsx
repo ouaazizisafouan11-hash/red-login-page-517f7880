@@ -263,13 +263,25 @@ const GameChat = () => {
               send();
             }
           }}
-          placeholder="Décris ton jeu… (ex: un platformer 2D rétro avec un chat ninja)"
+          placeholder={listening ? "🎤 Parle maintenant… (toutes langues)" : "Décris ton jeu… ou clique sur le micro 🎤"}
           className="min-h-[60px] resize-none"
           disabled={loading}
         />
-        <Button onClick={send} disabled={loading || !input.trim()} className="h-auto px-6">
-          {loading ? "…" : "Envoyer"}
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={toggleMic}
+            disabled={loading}
+            variant={listening ? "default" : "outline"}
+            size="icon"
+            className={listening ? "animate-pulse" : ""}
+            title={listening ? "Arrêter le micro" : "Parler (toutes langues)"}
+          >
+            {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </Button>
+          <Button onClick={send} disabled={loading || !input.trim()} size="icon">
+            {loading ? "…" : "→"}
+          </Button>
+        </div>
       </div>
     </main>
   );
