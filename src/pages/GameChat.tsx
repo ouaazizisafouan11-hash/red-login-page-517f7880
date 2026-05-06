@@ -181,7 +181,7 @@ const GameChat = () => {
       if (fnErr) throw fnErr;
 
       toast.success("Génération lancée ! Tu peux suivre dans 'Mes jeux'.");
-      navigate(`/play/${inserted.id}`);
+      navigate(`/games`);
     } catch (e) {
       console.error(e);
       toast.error("Impossible de lancer la génération.");
