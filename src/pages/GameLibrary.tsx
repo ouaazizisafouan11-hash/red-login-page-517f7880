@@ -121,7 +121,7 @@ const GameLibrary = () => {
                 className="gap-1.5"
               >
                 <Play className="h-4 w-4" />
-                {g.status === "ready" ? "Jouer" : "Voir"}
+                {g.status === "ready" ? "Play" : "Voir"}
               </Button>
             </div>
           ))}
