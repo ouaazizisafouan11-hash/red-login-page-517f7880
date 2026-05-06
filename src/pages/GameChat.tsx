@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
-import { LogOut, Library, Sparkles, Loader2 } from "lucide-react";
+import { LogOut, Library, Sparkles, Loader2, Mic, MicOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -58,11 +58,53 @@ const GameChat = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [listening, setListening] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  const toggleMic = () => {
+    const SR =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      toast.error("Reconnaissance vocale non supportée. Utilise Chrome ou Edge.");
+      return;
+    }
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
+    const rec = new SR();
+    rec.lang = navigator.language || "fr-FR";
+    rec.continuous = true;
+    rec.interimResults = true;
+    let finalText = "";
+    rec.onresult = (e: any) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t + " ";
+        else interim += t;
+      }
+      setInput((finalText + interim).trim());
+    };
+    rec.onerror = (e: any) => {
+      console.error("speech error", e);
+      setListening(false);
+      if (e.error === "not-allowed") toast.error("Microphone refusé.");
+    };
+    rec.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
+    rec.start();
+    recognitionRef.current = rec;
+    setListening(true);
+    toast.info("🎤 Parle maintenant — toutes langues acceptées.");
+  };
 
   // Find latest assistant message that has READY + ESTIMATION
   const lastReady = useMemo(() => {
@@ -263,13 +305,25 @@ const GameChat = () => {
               send();
             }
           }}
-          placeholder="Décris ton jeu… (ex: un platformer 2D rétro avec un chat ninja)"
+          placeholder={listening ? "🎤 Parle maintenant… (toutes langues)" : "Décris ton jeu… ou clique sur le micro 🎤"}
           className="min-h-[60px] resize-none"
           disabled={loading}
         />
-        <Button onClick={send} disabled={loading || !input.trim()} className="h-auto px-6">
-          {loading ? "…" : "Envoyer"}
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={toggleMic}
+            disabled={loading}
+            variant={listening ? "default" : "outline"}
+            size="icon"
+            className={listening ? "animate-pulse" : ""}
+            title={listening ? "Arrêter le micro" : "Parler (toutes langues)"}
+          >
+            {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </Button>
+          <Button onClick={send} disabled={loading || !input.trim()} size="icon">
+            {loading ? "…" : "→"}
+          </Button>
+        </div>
       </div>
     </main>
   );
