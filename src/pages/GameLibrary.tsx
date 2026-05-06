@@ -128,6 +128,11 @@ const GameLibrary = () => {
                   {g.status === "ready" && (
                     <span className="flex items-center gap-1 text-primary">
                       <CheckCircle2 className="h-3 w-3" /> Prêt
+                      {g.completed_at && g.created_at && (
+                        <span className="text-accent">
+                          · généré en {formatDuration(new Date(g.completed_at).getTime() - new Date(g.created_at).getTime())}
+                        </span>
+                      )}
                     </span>
                   )}
                   {g.status === "generating" && (
