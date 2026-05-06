@@ -38,10 +38,12 @@ const isReady = (s: string) => /READY_TO_GENERATE/i.test(s);
 
 const formatMinutes = (m: number) => {
   if (m < 60) return `${m} min`;
-  const h = Math.round(m / 60);
-  if (h < 24) return `${h} h`;
-  const d = Math.round(h / 24);
-  return `${d} jour${d > 1 ? "s" : ""}`;
+  const h = m / 60;
+  if (h < 24) return `${Math.round(h)} h`;
+  const d = h / 24;
+  if (d < 7) return `${Math.round(d)} jour${d >= 1.5 ? "s" : ""}`;
+  if (d < 30) return `${Math.round(d / 7)} semaine${d >= 10.5 ? "s" : ""}`;
+  return `${Math.round(d / 30)} mois`;
 };
 
 const GameChat = () => {
