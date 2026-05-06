@@ -14,6 +14,19 @@ type Game = {
   completed_at: string | null;
 };
 
+const formatDuration = (ms: number) => {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s} s`;
+  const m = s / 60;
+  if (m < 60) return `${Math.round(m)} min`;
+  const h = m / 60;
+  if (h < 24) return `${h.toFixed(1)} h`;
+  const d = h / 24;
+  if (d < 7) return `${Math.round(d)} j`;
+  if (d < 30) return `${Math.round(d / 7)} sem`;
+  return `${Math.round(d / 30)} mois`;
+};
+
 const SESSION_KEY = "game_session_id";
 const getSessionId = () => {
   let s = localStorage.getItem(SESSION_KEY);
@@ -54,15 +67,36 @@ const GameLibrary = () => {
     };
   }, []);
 
-  // Notify on ready
+  // Notify on ready with actual duration
   useEffect(() => {
     games.forEach((g) => {
       if (g.status === "ready" && !notified.has(g.id)) {
-        toast.success(`🎉 "${g.title}" est prêt à jouer !`);
+        const duration =
+          g.completed_at && g.created_at
+            ? new Date(g.completed_at).getTime() - new Date(g.created_at).getTime()
+            : null;
+        const durTxt = duration ? ` (en ${formatDuration(duration)})` : "";
+        toast.success(`🎉 "${g.title}" est prêt à jouer !${durTxt}`, {
+          description: "Clique sur Play pour lancer le jeu.",
+          duration: 8000,
+        });
+        // Browser notification
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("🎮 Jeu prêt !", {
+            body: `"${g.title}" est prêt${durTxt}. Clique sur Play pour jouer.`,
+          });
+        }
         setNotified((s) => new Set(s).add(g.id));
       }
     });
   }, [games, notified]);
+
+  // Ask permission for browser notifications
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-6">
@@ -94,6 +128,11 @@ const GameLibrary = () => {
                   {g.status === "ready" && (
                     <span className="flex items-center gap-1 text-primary">
                       <CheckCircle2 className="h-3 w-3" /> Prêt
+                      {g.completed_at && g.created_at && (
+                        <span className="text-accent">
+                          · généré en {formatDuration(new Date(g.completed_at).getTime() - new Date(g.created_at).getTime())}
+                        </span>
+                      )}
                     </span>
                   )}
                   {g.status === "generating" && (
