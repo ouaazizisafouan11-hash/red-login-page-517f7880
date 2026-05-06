@@ -14,6 +14,19 @@ type Game = {
   completed_at: string | null;
 };
 
+const formatDuration = (ms: number) => {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s} s`;
+  const m = s / 60;
+  if (m < 60) return `${Math.round(m)} min`;
+  const h = m / 60;
+  if (h < 24) return `${h.toFixed(1)} h`;
+  const d = h / 24;
+  if (d < 7) return `${Math.round(d)} j`;
+  if (d < 30) return `${Math.round(d / 7)} sem`;
+  return `${Math.round(d / 30)} mois`;
+};
+
 const SESSION_KEY = "game_session_id";
 const getSessionId = () => {
   let s = localStorage.getItem(SESSION_KEY);
