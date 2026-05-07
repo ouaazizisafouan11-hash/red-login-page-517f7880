@@ -245,8 +245,12 @@ const GameChat = () => {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text.slice(0, 2000));
     u.lang = lang;
+    const voices = window.speechSynthesis.getVoices?.() ?? [];
+    const matchingVoice = voices.find((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+    if (matchingVoice) u.voice = matchingVoice;
     u.rate = 1;
     u.onend = () => {
+      voiceProcessingRef.current = false;
       if (voiceChatRef.current) startVoiceListen();
     };
     window.speechSynthesis.speak(u);
@@ -256,16 +260,20 @@ const GameChat = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) return;
     const rec = new SR();
-    rec.lang = navigator.language || "fr-FR";
+    rec.lang = speechLangRef.current;
     rec.continuous = false;
     rec.interimResults = false;
     rec.onresult = async (e: any) => {
       const transcript = e.results[0][0].transcript.trim();
       if (!transcript) return;
-      const lang = detectLang(transcript);
+      const lang = speechLangRef.current;
+      voiceProcessingRef.current = true;
       const reply = await send(transcript);
       if (voiceChatRef.current && reply) {
         speak(cleanForDisplay(reply), lang);
+      } else {
+        voiceProcessingRef.current = false;
+        if (voiceChatRef.current) setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
       }
     };
     rec.onerror = (e: any) => {
@@ -274,7 +282,7 @@ const GameChat = () => {
     };
     rec.onend = () => {
       // restart if still in voice mode and not currently speaking/loading
-      if (voiceChatRef.current && !window.speechSynthesis?.speaking) {
+      if (voiceChatRef.current && !voiceProcessingRef.current && !window.speechSynthesis?.speaking) {
         setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
       }
     };
@@ -292,6 +300,7 @@ const GameChat = () => {
     }
     if (voiceChat) {
       voiceChatRef.current = false;
+      voiceProcessingRef.current = false;
       setVoiceChat(false);
       try { voiceRecRef.current?.stop(); } catch {}
       window.speechSynthesis?.cancel();
@@ -299,8 +308,9 @@ const GameChat = () => {
       return;
     }
     voiceChatRef.current = true;
+    voiceProcessingRef.current = false;
     setVoiceChat(true);
-    toast.success("📞 Mode conversation activé — parle, je te réponds !");
+    toast.success(`📞 Mode conversation activé — parle en ${SPEECH_LANGUAGES.find((l) => l.code === speechLangRef.current)?.label ?? speechLangRef.current}.`);
     startVoiceListen();
   };
 
