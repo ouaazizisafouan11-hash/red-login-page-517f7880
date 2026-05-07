@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
-import { LogOut, Library, Sparkles, Loader2, Mic, MicOff } from "lucide-react";
+import { LogOut, Library, Sparkles, Loader2, Mic, MicOff, Phone, PhoneOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
