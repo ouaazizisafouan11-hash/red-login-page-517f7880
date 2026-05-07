@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
-import { LogOut, Library, Sparkles, Loader2, Mic, MicOff, Phone, PhoneOff } from "lucide-react";
+import { LogOut, Library, Sparkles, Loader2, Mic, MicOff, Phone, PhoneOff, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -20,6 +20,23 @@ const getSessionId = () => {
   }
   return s;
 };
+
+const SPEECH_LANGUAGES = [
+  { code: "ar-SA", label: "العربية" },
+  { code: "fr-FR", label: "Français" },
+  { code: "en-US", label: "English" },
+  { code: "es-ES", label: "Español" },
+  { code: "de-DE", label: "Deutsch" },
+  { code: "it-IT", label: "Italiano" },
+] as const;
+
+const getInitialSpeechLang = () => {
+  const saved = localStorage.getItem("speech_language");
+  if (saved && SPEECH_LANGUAGES.some((l) => l.code === saved)) return saved;
+  return "ar-SA";
+};
+
+const langDir = (lang: string) => (lang.startsWith("ar") ? "rtl" : "ltr");
 
 // Strip the marker lines from displayed content
 const cleanForDisplay = (s: string) =>
@@ -60,14 +77,22 @@ const GameChat = () => {
   const [generating, setGenerating] = useState(false);
   const [listening, setListening] = useState(false);
   const [voiceChat, setVoiceChat] = useState(false);
+  const [speechLang, setSpeechLang] = useState(getInitialSpeechLang);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const voiceChatRef = useRef(false);
   const voiceRecRef = useRef<any>(null);
+  const speechLangRef = useRef(speechLang);
+  const voiceProcessingRef = useRef(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    speechLangRef.current = speechLang;
+    localStorage.setItem("speech_language", speechLang);
+  }, [speechLang]);
 
   const toggleMic = () => {
     const SR =
@@ -81,7 +106,7 @@ const GameChat = () => {
       return;
     }
     const rec = new SR();
-    rec.lang = navigator.language || "fr-FR";
+    rec.lang = speechLangRef.current;
     rec.continuous = true;
     rec.interimResults = true;
     let finalText = "";
@@ -106,7 +131,7 @@ const GameChat = () => {
     rec.start();
     recognitionRef.current = rec;
     setListening(true);
-    toast.info("🎤 Parle maintenant — toutes langues acceptées.");
+    toast.info(`🎤 Parle maintenant en ${SPEECH_LANGUAGES.find((l) => l.code === speechLangRef.current)?.label ?? speechLangRef.current}.`);
   };
 
   // Find latest assistant message that has READY + ESTIMATION
@@ -196,26 +221,17 @@ const GameChat = () => {
     return acc;
   };
 
-  // Detect a BCP-47 lang code from text (very lightweight)
-  const detectLang = (t: string): string => {
-    if (/[\u0600-\u06FF]/.test(t)) return "ar-SA";
-    if (/[\u4E00-\u9FFF]/.test(t)) return "zh-CN";
-    if (/[\u3040-\u30FF]/.test(t)) return "ja-JP";
-    if (/[\uAC00-\uD7AF]/.test(t)) return "ko-KR";
-    if (/[\u0400-\u04FF]/.test(t)) return "ru-RU";
-    if (/\b(the|and|you|what|game)\b/i.test(t)) return "en-US";
-    if (/\b(el|la|los|que|juego)\b/i.test(t)) return "es-ES";
-    if (/\b(le|la|les|que|jeu|bonjour)\b/i.test(t)) return "fr-FR";
-    return navigator.language || "fr-FR";
-  };
-
   const speak = (text: string, lang: string) => {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text.slice(0, 2000));
     u.lang = lang;
+    const voices = window.speechSynthesis.getVoices?.() ?? [];
+    const matchingVoice = voices.find((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+    if (matchingVoice) u.voice = matchingVoice;
     u.rate = 1;
     u.onend = () => {
+      voiceProcessingRef.current = false;
       if (voiceChatRef.current) startVoiceListen();
     };
     window.speechSynthesis.speak(u);
@@ -225,16 +241,20 @@ const GameChat = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) return;
     const rec = new SR();
-    rec.lang = navigator.language || "fr-FR";
+    rec.lang = speechLangRef.current;
     rec.continuous = false;
     rec.interimResults = false;
     rec.onresult = async (e: any) => {
       const transcript = e.results[0][0].transcript.trim();
       if (!transcript) return;
-      const lang = detectLang(transcript);
+      const lang = speechLangRef.current;
+      voiceProcessingRef.current = true;
       const reply = await send(transcript);
       if (voiceChatRef.current && reply) {
         speak(cleanForDisplay(reply), lang);
+      } else {
+        voiceProcessingRef.current = false;
+        if (voiceChatRef.current) setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
       }
     };
     rec.onerror = (e: any) => {
@@ -243,7 +263,7 @@ const GameChat = () => {
     };
     rec.onend = () => {
       // restart if still in voice mode and not currently speaking/loading
-      if (voiceChatRef.current && !window.speechSynthesis?.speaking) {
+      if (voiceChatRef.current && !voiceProcessingRef.current && !window.speechSynthesis?.speaking) {
         setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
       }
     };
@@ -261,6 +281,7 @@ const GameChat = () => {
     }
     if (voiceChat) {
       voiceChatRef.current = false;
+      voiceProcessingRef.current = false;
       setVoiceChat(false);
       try { voiceRecRef.current?.stop(); } catch {}
       window.speechSynthesis?.cancel();
@@ -268,9 +289,21 @@ const GameChat = () => {
       return;
     }
     voiceChatRef.current = true;
+    voiceProcessingRef.current = false;
     setVoiceChat(true);
-    toast.success("📞 Mode conversation activé — parle, je te réponds !");
+    toast.success(`📞 Mode conversation activé — parle en ${SPEECH_LANGUAGES.find((l) => l.code === speechLangRef.current)?.label ?? speechLangRef.current}.`);
     startVoiceListen();
+  };
+
+  const changeSpeechLang = (lang: string) => {
+    setSpeechLang(lang);
+    try { recognitionRef.current?.stop(); } catch {}
+    try { voiceRecRef.current?.stop(); } catch {}
+    if (voiceChatRef.current) {
+      voiceProcessingRef.current = false;
+      window.speechSynthesis?.cancel();
+      setTimeout(() => startVoiceListen(), 250);
+    }
   };
 
   const generateGame = async () => {
@@ -377,19 +410,35 @@ const GameChat = () => {
       )}
 
       <div className="mx-auto mt-4 flex w-full max-w-3xl gap-2">
-        <Textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              send();
-            }
-          }}
-          placeholder={listening ? "🎤 Parle maintenant… (toutes langues)" : "Décris ton jeu… ou clique sur le micro 🎤"}
-          className="min-h-[60px] resize-none"
-          disabled={loading}
-        />
+        <div className="flex flex-1 flex-col gap-2">
+          <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            <Languages className="h-4 w-4" />
+            <select
+              value={speechLang}
+              onChange={(e) => changeSpeechLang(e.target.value)}
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+              aria-label="Voice language"
+            >
+              {SPEECH_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>{lang.label}</option>
+              ))}
+            </select>
+          </label>
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }}
+            dir={langDir(speechLang)}
+            placeholder={listening ? "🎤 تكلّم الآن…" : "اكتب أو تكلّم عن لعبتك… 🎤"}
+            className="min-h-[60px] resize-none"
+            disabled={loading}
+          />
+        </div>
         <div className="flex flex-col gap-2">
           <Button
             onClick={toggleMic}
