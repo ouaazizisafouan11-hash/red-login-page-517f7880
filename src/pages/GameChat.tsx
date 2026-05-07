@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
-import { LogOut, Library, Sparkles, Loader2, Mic, MicOff, Phone, PhoneOff } from "lucide-react";
+import { LogOut, Library, Sparkles, Loader2, Mic, MicOff, Phone, PhoneOff, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -20,6 +20,27 @@ const getSessionId = () => {
   }
   return s;
 };
+
+const SPEECH_LANGUAGES = [
+  { code: "ar-SA", label: "العربية" },
+  { code: "fr-FR", label: "Français" },
+  { code: "en-US", label: "English" },
+  { code: "es-ES", label: "Español" },
+  { code: "de-DE", label: "Deutsch" },
+  { code: "it-IT", label: "Italiano" },
+] as const;
+
+const getInitialSpeechLang = () => {
+  const lang = (navigator.language || "fr-FR").toLowerCase();
+  if (lang.startsWith("ar")) return "ar-SA";
+  if (lang.startsWith("en")) return "en-US";
+  if (lang.startsWith("es")) return "es-ES";
+  if (lang.startsWith("de")) return "de-DE";
+  if (lang.startsWith("it")) return "it-IT";
+  return "fr-FR";
+};
+
+const langDir = (lang: string) => (lang.startsWith("ar") ? "rtl" : "ltr");
 
 // Strip the marker lines from displayed content
 const cleanForDisplay = (s: string) =>
@@ -60,14 +81,21 @@ const GameChat = () => {
   const [generating, setGenerating] = useState(false);
   const [listening, setListening] = useState(false);
   const [voiceChat, setVoiceChat] = useState(false);
+  const [speechLang, setSpeechLang] = useState(getInitialSpeechLang);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const voiceChatRef = useRef(false);
   const voiceRecRef = useRef<any>(null);
+  const speechLangRef = useRef(speechLang);
+  const voiceProcessingRef = useRef(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    speechLangRef.current = speechLang;
+  }, [speechLang]);
 
   const toggleMic = () => {
     const SR =
@@ -81,7 +109,7 @@ const GameChat = () => {
       return;
     }
     const rec = new SR();
-    rec.lang = navigator.language || "fr-FR";
+    rec.lang = speechLangRef.current;
     rec.continuous = true;
     rec.interimResults = true;
     let finalText = "";
@@ -106,7 +134,7 @@ const GameChat = () => {
     rec.start();
     recognitionRef.current = rec;
     setListening(true);
-    toast.info("🎤 Parle maintenant — toutes langues acceptées.");
+    toast.info(`🎤 Parle maintenant en ${SPEECH_LANGUAGES.find((l) => l.code === speechLangRef.current)?.label ?? speechLangRef.current}.`);
   };
 
   // Find latest assistant message that has READY + ESTIMATION
