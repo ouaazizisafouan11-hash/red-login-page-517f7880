@@ -314,6 +314,17 @@ const GameChat = () => {
     startVoiceListen();
   };
 
+  const changeSpeechLang = (lang: string) => {
+    setSpeechLang(lang);
+    try { recognitionRef.current?.stop(); } catch {}
+    try { voiceRecRef.current?.stop(); } catch {}
+    if (voiceChatRef.current) {
+      voiceProcessingRef.current = false;
+      window.speechSynthesis?.cancel();
+      setTimeout(() => startVoiceListen(), 250);
+    }
+  };
+
   const generateGame = async () => {
     if (!lastReady || generating) return;
     setGenerating(true);
@@ -418,19 +429,35 @@ const GameChat = () => {
       )}
 
       <div className="mx-auto mt-4 flex w-full max-w-3xl gap-2">
-        <Textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              send();
-            }
-          }}
-          placeholder={listening ? "🎤 Parle maintenant… (toutes langues)" : "Décris ton jeu… ou clique sur le micro 🎤"}
-          className="min-h-[60px] resize-none"
-          disabled={loading}
-        />
+        <div className="flex flex-1 flex-col gap-2">
+          <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            <Languages className="h-4 w-4" />
+            <select
+              value={speechLang}
+              onChange={(e) => changeSpeechLang(e.target.value)}
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+              aria-label="Voice language"
+            >
+              {SPEECH_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>{lang.label}</option>
+              ))}
+            </select>
+          </label>
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }}
+            dir={langDir(speechLang)}
+            placeholder={listening ? "🎤 تكلّم الآن…" : "اكتب أو تكلّم عن لعبتك… 🎤"}
+            className="min-h-[60px] resize-none"
+            disabled={loading}
+          />
+        </div>
         <div className="flex flex-col gap-2">
           <Button
             onClick={toggleMic}
