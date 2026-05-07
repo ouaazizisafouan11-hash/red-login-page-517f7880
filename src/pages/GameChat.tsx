@@ -401,7 +401,17 @@ const GameChat = () => {
           >
             {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </Button>
-          <Button onClick={send} disabled={loading || !input.trim()} size="icon">
+          <Button
+            onClick={toggleVoiceChat}
+            disabled={loading}
+            variant={voiceChat ? "default" : "outline"}
+            size="icon"
+            className={voiceChat ? "animate-pulse" : ""}
+            title={voiceChat ? "Terminer l'appel" : "Conversation vocale (mode appel)"}
+          >
+            {voiceChat ? <PhoneOff className="h-4 w-4" /> : <Phone className="h-4 w-4" />}
+          </Button>
+          <Button onClick={() => send()} disabled={loading || !input.trim()} size="icon">
             {loading ? "…" : "→"}
           </Button>
         </div>
