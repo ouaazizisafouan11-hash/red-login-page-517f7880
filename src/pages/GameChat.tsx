@@ -122,10 +122,10 @@ const GameChat = () => {
     return null;
   }, [messages]);
 
-  const send = async () => {
-    const text = input.trim();
-    if (!text || loading) return;
-    setInput("");
+  const send = async (overrideText?: string): Promise<string> => {
+    const text = (overrideText ?? input).trim();
+    if (!text || loading) return "";
+    if (!overrideText) setInput("");
     const userMsg: Msg = { role: "user", content: text };
     setMessages((p) => [...p, userMsg]);
     setLoading(true);
@@ -148,7 +148,7 @@ const GameChat = () => {
         else if (resp.status === 402) toast.error("Crédits IA épuisés.");
         else toast.error("Erreur lors de la génération.");
         setLoading(false);
-        return;
+        return "";
       }
 
       setMessages((p) => [...p, { role: "assistant", content: "" }]);
@@ -193,6 +193,84 @@ const GameChat = () => {
     } finally {
       setLoading(false);
     }
+    return acc;
+  };
+
+  // Detect a BCP-47 lang code from text (very lightweight)
+  const detectLang = (t: string): string => {
+    if (/[\u0600-\u06FF]/.test(t)) return "ar-SA";
+    if (/[\u4E00-\u9FFF]/.test(t)) return "zh-CN";
+    if (/[\u3040-\u30FF]/.test(t)) return "ja-JP";
+    if (/[\uAC00-\uD7AF]/.test(t)) return "ko-KR";
+    if (/[\u0400-\u04FF]/.test(t)) return "ru-RU";
+    if (/\b(the|and|you|what|game)\b/i.test(t)) return "en-US";
+    if (/\b(el|la|los|que|juego)\b/i.test(t)) return "es-ES";
+    if (/\b(le|la|les|que|jeu|bonjour)\b/i.test(t)) return "fr-FR";
+    return navigator.language || "fr-FR";
+  };
+
+  const speak = (text: string, lang: string) => {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.slice(0, 2000));
+    u.lang = lang;
+    u.rate = 1;
+    u.onend = () => {
+      if (voiceChatRef.current) startVoiceListen();
+    };
+    window.speechSynthesis.speak(u);
+  };
+
+  const startVoiceListen = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = navigator.language || "fr-FR";
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.onresult = async (e: any) => {
+      const transcript = e.results[0][0].transcript.trim();
+      if (!transcript) return;
+      const lang = detectLang(transcript);
+      const reply = await send(transcript);
+      if (voiceChatRef.current && reply) {
+        speak(cleanForDisplay(reply), lang);
+      }
+    };
+    rec.onerror = (e: any) => {
+      console.error("voice chat err", e);
+      if (voiceChatRef.current) setTimeout(() => voiceChatRef.current && startVoiceListen(), 800);
+    };
+    rec.onend = () => {
+      // restart if still in voice mode and not currently speaking/loading
+      if (voiceChatRef.current && !window.speechSynthesis?.speaking) {
+        setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
+      }
+    };
+    try {
+      rec.start();
+      voiceRecRef.current = rec;
+    } catch {}
+  };
+
+  const toggleVoiceChat = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      toast.error("Conversation vocale non supportée. Utilise Chrome ou Edge.");
+      return;
+    }
+    if (voiceChat) {
+      voiceChatRef.current = false;
+      setVoiceChat(false);
+      try { voiceRecRef.current?.stop(); } catch {}
+      window.speechSynthesis?.cancel();
+      toast.info("📞 Appel terminé.");
+      return;
+    }
+    voiceChatRef.current = true;
+    setVoiceChat(true);
+    toast.success("📞 Mode conversation activé — parle, je te réponds !");
+    startVoiceListen();
   };
 
   const generateGame = async () => {
