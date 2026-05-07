@@ -227,19 +227,6 @@ const GameChat = () => {
     return acc;
   };
 
-  // Detect a BCP-47 lang code from text (very lightweight)
-  const detectLang = (t: string): string => {
-    if (/[\u0600-\u06FF]/.test(t)) return "ar-SA";
-    if (/[\u4E00-\u9FFF]/.test(t)) return "zh-CN";
-    if (/[\u3040-\u30FF]/.test(t)) return "ja-JP";
-    if (/[\uAC00-\uD7AF]/.test(t)) return "ko-KR";
-    if (/[\u0400-\u04FF]/.test(t)) return "ru-RU";
-    if (/\b(the|and|you|what|game)\b/i.test(t)) return "en-US";
-    if (/\b(el|la|los|que|juego)\b/i.test(t)) return "es-ES";
-    if (/\b(le|la|les|que|jeu|bonjour)\b/i.test(t)) return "fr-FR";
-    return navigator.language || "fr-FR";
-  };
-
   const speak = (text: string, lang: string) => {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
