@@ -33,12 +33,6 @@ const SPEECH_LANGUAGES = [
 const getInitialSpeechLang = () => {
   const saved = localStorage.getItem("speech_language");
   if (saved && SPEECH_LANGUAGES.some((l) => l.code === saved)) return saved;
-  const lang = (navigator.language || "fr-FR").toLowerCase();
-  if (lang.startsWith("ar")) return "ar-SA";
-  if (lang.startsWith("en")) return "en-US";
-  if (lang.startsWith("es")) return "es-ES";
-  if (lang.startsWith("de")) return "de-DE";
-  if (lang.startsWith("it")) return "it-IT";
   return "ar-SA";
 };
 
