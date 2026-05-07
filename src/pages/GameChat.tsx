@@ -273,7 +273,7 @@ const GameChat = () => {
       voiceProcessingRef.current = true;
       const reply = await send(transcript);
       if (voiceChatRef.current && reply) {
-        speak(cleanForDisplay(reply), lang);
+        speak(cleanForSpeech(reply), lang);
       } else {
         voiceProcessingRef.current = false;
         if (voiceChatRef.current) setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
