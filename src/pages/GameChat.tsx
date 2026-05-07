@@ -45,6 +45,28 @@ const cleanForDisplay = (s: string) =>
     .replace(/READY_TO_GENERATE\s*$/i, "")
     .trim();
 
+// Strip markdown, emojis, code blocks etc. so TTS reads naturally.
+// Also shorten to keep the spoken reply digestible.
+const cleanForSpeech = (s: string, maxChars = 350) => {
+  let t = cleanForDisplay(s);
+  t = t
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]*`/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[*_~>#-]+/g, " ")
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (t.length > maxChars) {
+    const slice = t.slice(0, maxChars);
+    const lastDot = Math.max(slice.lastIndexOf("."), slice.lastIndexOf("!"), slice.lastIndexOf("?"), slice.lastIndexOf("،"), slice.lastIndexOf("."));
+    t = (lastDot > 80 ? slice.slice(0, lastDot + 1) : slice).trim();
+  }
+  return t;
+};
+
 const parseEstimation = (s: string): { minutes: number; label: string } | null => {
   const m = s.match(/ESTIMATION:\s*(\d+)\s*min\s*-\s*(.+)/i);
   if (!m) return null;
