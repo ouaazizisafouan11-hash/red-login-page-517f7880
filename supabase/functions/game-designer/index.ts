@@ -49,9 +49,12 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, mode } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const voiceModePrompt = mode === "voice"
+      ? `MODE APPEL VOCAL — PRIORITÉ ABSOLUE : réponds comme dans une vraie conversation orale, pas comme un texte à lire. Réponds directement à ce que l'utilisateur vient de dire, en 1 à 3 phrases courtes, naturelles et utiles. Utilise EXACTEMENT la langue du dernier message utilisateur. N'écris jamais d'actions entre astérisques ou parenthèses comme "*parle en français*". N'utilise pas de markdown, pas de listes, pas de code, pas d'emojis inutiles, pas de balises ESTIMATION ni READY_TO_GENERATE sauf si l'utilisateur demande clairement de générer un jeu et que le design est vraiment prêt. Le texte doit être immédiatement prononçable par synthèse vocale.`
+      : null;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -63,6 +66,7 @@ Deno.serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
+          ...(voiceModePrompt ? [{ role: "system", content: voiceModePrompt }] : []),
           ...messages,
         ],
         stream: true,
