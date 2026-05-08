@@ -30,6 +30,14 @@ const SPEECH_LANGUAGES = [
   { code: "it-IT", label: "Italiano" },
 ] as const;
 
+const SPEECH_LANGUAGE_CODES = SPEECH_LANGUAGES.map((l) => l.code);
+
+const normalizeArabicSpeech = (text: string) =>
+  text
+    .replace(/activis|factivis|اكتيفيس|فاكتيفيس/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
 const getInitialSpeechLang = () => {
   const saved = localStorage.getItem("speech_language");
   if (saved && SPEECH_LANGUAGES.some((l) => l.code === saved)) return saved;
@@ -55,7 +63,11 @@ const cleanForSpeech = (s: string, maxChars = 350) => {
     .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
     .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*[-–—•]\s*/gm, "")
+    .replace(/\*[^*]{0,80}\*/g, " ")
+    .replace(/\([^)]{0,80}\)/g, " ")
     .replace(/[*_~>#-]+/g, " ")
+    .replace(/\b(?:parle|répond|يتحدث|تتحدث|speaks?|speaking)\s+(?:en|بال|in)\s+[\p{L}\p{M} -]+/giu, " ")
     .replace(/\p{Extended_Pictographic}/gu, "")
     .replace(/\s+/g, " ")
     .trim();
