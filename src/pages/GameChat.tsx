@@ -167,6 +167,31 @@ const GameChat = () => {
     localStorage.setItem("speech_language", speechLang);
   }, [speechLang]);
 
+  // Stop ALL voice activity when leaving the page (unmount or tab close)
+  useEffect(() => {
+    const stopEverything = () => {
+      voiceChatRef.current = false;
+      voiceProcessingRef.current = false;
+      voiceTranscriptRef.current = "";
+      if (voiceSilenceTimerRef.current) {
+        window.clearTimeout(voiceSilenceTimerRef.current);
+        voiceSilenceTimerRef.current = null;
+      }
+      safeStopRecognition(recognitionRef.current);
+      safeStopRecognition(voiceRecRef.current);
+      recognitionRef.current = null;
+      voiceRecRef.current = null;
+      try { window.speechSynthesis?.cancel(); } catch {}
+    };
+    window.addEventListener("beforeunload", stopEverything);
+    window.addEventListener("pagehide", stopEverything);
+    return () => {
+      window.removeEventListener("beforeunload", stopEverything);
+      window.removeEventListener("pagehide", stopEverything);
+      stopEverything();
+    };
+  }, []);
+
   const toggleMic = () => {
     const SR =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
