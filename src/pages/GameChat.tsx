@@ -8,6 +8,25 @@ import { LogOut, Library, Sparkles, Loader2, Mic, MicOff, Phone, PhoneOff, Langu
 import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type SpeechRecognitionErrorEventLike = { error: string };
+type SpeechRecognitionResultLike = { isFinal?: boolean; 0: { transcript: string } };
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResultLike>;
+};
+type BrowserSpeechRecognition = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives?: number;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+  onstart: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+type SpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/game-designer`;
 
@@ -38,9 +57,26 @@ const normalizeArabicSpeech = (text: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
+const getSpeechRecognition = (): SpeechRecognitionConstructor | null => {
+  const speechWindow = window as Window & {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition ?? null;
+};
+
+const safeStopRecognition = (recognition: BrowserSpeechRecognition | null) => {
+  if (!recognition) return;
+  try {
+    recognition.stop();
+  } catch (error) {
+    console.debug("speech stop ignored", error);
+  }
+};
+
 const getInitialSpeechLang = () => {
   const saved = localStorage.getItem("speech_language");
-  if (saved && SPEECH_LANGUAGES.some((l) => l.code === saved)) return saved;
+  if (saved && SPEECH_LANGUAGE_CODES.includes(saved)) return saved;
   return "ar-SA";
 };
 
