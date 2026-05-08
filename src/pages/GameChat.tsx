@@ -355,6 +355,8 @@ const GameChat = () => {
     if (voiceChat) {
       voiceChatRef.current = false;
       voiceProcessingRef.current = false;
+      voiceTranscriptRef.current = "";
+      if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
       setVoiceChat(false);
       try { voiceRecRef.current?.stop(); } catch {}
       window.speechSynthesis?.cancel();
@@ -363,6 +365,8 @@ const GameChat = () => {
     }
     voiceChatRef.current = true;
     voiceProcessingRef.current = false;
+    voiceTranscriptRef.current = "";
+    if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
     setVoiceChat(true);
     toast.success(`📞 Mode conversation activé — parle en ${SPEECH_LANGUAGES.find((l) => l.code === speechLangRef.current)?.label ?? speechLangRef.current}.`);
     startVoiceListen();
@@ -374,6 +378,8 @@ const GameChat = () => {
     try { voiceRecRef.current?.stop(); } catch {}
     if (voiceChatRef.current) {
       voiceProcessingRef.current = false;
+      voiceTranscriptRef.current = "";
+      if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
       window.speechSynthesis?.cancel();
       setTimeout(() => startVoiceListen(), 250);
     }
