@@ -118,6 +118,9 @@ const GameChat = () => {
   const voiceRecRef = useRef<any>(null);
   const speechLangRef = useRef(speechLang);
   const voiceProcessingRef = useRef(false);
+  const voiceSilenceTimerRef = useRef<number | null>(null);
+  const voiceTranscriptRef = useRef("");
+  const voiceStartedRef = useRef(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -181,7 +184,7 @@ const GameChat = () => {
     return null;
   }, [messages]);
 
-  const send = async (overrideText?: string): Promise<string> => {
+  const send = async (overrideText?: string, mode?: "voice"): Promise<string> => {
     const text = (overrideText ?? input).trim();
     if (!text || loading) return "";
     if (!overrideText) setInput("");
@@ -199,6 +202,7 @@ const GameChat = () => {
         },
         body: JSON.stringify({
           messages: [...messages, userMsg].map((m) => ({ role: m.role, content: m.content })),
+          mode,
         }),
       });
 
