@@ -49,7 +49,7 @@ const SPEECH_LANGUAGES = [
   { code: "it-IT", label: "Italiano" },
 ] as const;
 
-const SPEECH_LANGUAGE_CODES = SPEECH_LANGUAGES.map((l) => l.code);
+const SPEECH_LANGUAGE_CODES: readonly string[] = SPEECH_LANGUAGES.map((l) => l.code);
 
 const normalizeArabicSpeech = (text: string) =>
   text
@@ -149,9 +149,9 @@ const GameChat = () => {
   const [voiceChat, setVoiceChat] = useState(false);
   const [speechLang, setSpeechLang] = useState(getInitialSpeechLang);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const voiceChatRef = useRef(false);
-  const voiceRecRef = useRef<any>(null);
+  const voiceRecRef = useRef<BrowserSpeechRecognition | null>(null);
   const speechLangRef = useRef(speechLang);
   const voiceProcessingRef = useRef(false);
   const voiceSilenceTimerRef = useRef<number | null>(null);
