@@ -381,28 +381,38 @@ const GameChat = () => {
     }
     // Use the language the AI actually wrote in, not just the UI selection
     const lang = detectLangCode(spokenText, requestedLang);
+    const chunks = splitSpeechText(makeSpeechTextNatural(spokenText, lang));
+    let chunkIndex = 0;
     const doSpeak = () => {
       window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(spokenText.slice(0, 1200));
-      u.lang = lang;
       const voices = window.speechSynthesis.getVoices?.() ?? [];
       const prefix = lang.slice(0, 2).toLowerCase();
       const matchingVoice =
         voices.find((v) => v.lang.toLowerCase() === lang.toLowerCase()) ||
         voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
-      if (matchingVoice) u.voice = matchingVoice;
-      u.rate = 1;
-      u.pitch = 1;
-      u.volume = 1;
-      u.onend = () => {
-        voiceProcessingRef.current = false;
-        if (voiceChatRef.current) startVoiceListen();
+      const speakNext = () => {
+        if (!voiceChatRef.current || chunkIndex >= chunks.length) {
+          voiceProcessingRef.current = false;
+          if (voiceChatRef.current) startVoiceListen();
+          return;
+        }
+        const u = new SpeechSynthesisUtterance(chunks[chunkIndex]);
+        u.lang = lang;
+        if (matchingVoice) u.voice = matchingVoice;
+        u.rate = lang.startsWith("ar") ? 0.92 : 1;
+        u.pitch = 1;
+        u.volume = 1;
+        u.onend = () => {
+          chunkIndex += 1;
+          speakNext();
+        };
+        u.onerror = () => {
+          voiceProcessingRef.current = false;
+          if (voiceChatRef.current) startVoiceListen();
+        };
+        window.speechSynthesis.speak(u);
       };
-      u.onerror = () => {
-        voiceProcessingRef.current = false;
-        if (voiceChatRef.current) startVoiceListen();
-      };
-      window.speechSynthesis.speak(u);
+      speakNext();
     };
     // Voices may load async on first call
     const voicesNow = window.speechSynthesis.getVoices?.() ?? [];
