@@ -161,6 +161,13 @@ const splitSpeechText = (text: string, maxChars = 220) => {
   return chunks;
 };
 
+const unlockSpeechSynthesis = () => {
+  if (!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(" ");
+  u.volume = 0;
+  window.speechSynthesis.speak(u);
+};
+
 
 const parseEstimation = (s: string): { minutes: number; label: string } | null => {
   const m = s.match(/ESTIMATION:\s*(\d+)\s*min\s*-\s*(.+)/i);
