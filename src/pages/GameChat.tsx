@@ -547,6 +547,8 @@ const GameChat = () => {
     voiceChatRef.current = true;
     voiceProcessingRef.current = false;
     voiceTranscriptRef.current = "";
+    preparedSpeechRef.current = "speechSynthesis" in window ? new SpeechSynthesisUtterance() : null;
+    unlockSpeechSynthesis();
     if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
     setVoiceChat(true);
     toast.success(`📞 Mode conversation activé — parle en ${SPEECH_LANGUAGES.find((l) => l.code === speechLangRef.current)?.label ?? speechLangRef.current}.`);
