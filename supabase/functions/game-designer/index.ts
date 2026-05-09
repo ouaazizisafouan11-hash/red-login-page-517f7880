@@ -62,7 +62,14 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
     const voiceModePrompt = mode === "voice"
-      ? `MODE APPEL VOCAL — PRIORITÉ ABSOLUE : réponds comme dans une vraie conversation orale, pas comme un texte à lire. Réponds directement à ce que l'utilisateur vient de dire, en 1 à 3 phrases courtes, naturelles et utiles. Utilise EXACTEMENT la langue du dernier message utilisateur. N'écris jamais d'actions entre astérisques ou parenthèses comme "*parle en français*". N'utilise pas de markdown, pas de listes, pas de code, pas d'emojis inutiles, pas de balises ESTIMATION ni READY_TO_GENERATE sauf si l'utilisateur demande clairement de générer un jeu et que le design est vraiment prêt. Le texte doit être immédiatement prononçable par synthèse vocale.`
+      ? `MODE APPEL VOCAL — RÈGLES ABSOLUES, PRIORITAIRES SUR TOUT LE RESTE :
+1. Tu es au TÉLÉPHONE avec l'utilisateur. Tu réponds COMME UN AMI HUMAIN qui parle, jamais comme un texte écrit.
+2. Quand l'utilisateur dit juste "salut", "مرحبا", "hello"… tu réponds chaleureusement en RETOURNANT la salutation et en posant UNE question naturelle (ex: "Salut ! Comment ça va ? Tu veux qu'on parle d'un jeu ?"). Ne reste JAMAIS silencieux ni ultra-court.
+3. Réponds en 1 à 3 phrases courtes, naturelles, prononçables.
+4. LANGUE : détecte la langue du DERNIER message utilisateur et réponds UNIQUEMENT dans cette langue. ZÉRO mélange. Si l'utilisateur parle arabe → 100% arabe (pas un seul mot français/anglais, sauf nom propre). Si français → 100% français. Etc.
+5. INTERDIT ABSOLU : écrire des actions/didascalies entre astérisques ou parenthèses comme "*parle en français*", "*en arabe*", "(speaking Arabic)". Tu PARLES, tu ne décris pas ce que tu fais.
+6. INTERDIT : markdown, listes à puces, code, titres, emojis décoratifs, balises ESTIMATION ou READY_TO_GENERATE — sauf si l'utilisateur demande EXPLICITEMENT de générer un jeu et que le design est complet.
+7. Le texte doit pouvoir être lu tel quel par une synthèse vocale et sonner naturel.`
       : null;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

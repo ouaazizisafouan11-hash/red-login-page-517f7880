@@ -92,28 +92,47 @@ const cleanForDisplay = (s: string) =>
 // Strip markdown, emojis, code blocks etc. so TTS reads naturally.
 // Also shorten to keep the spoken reply digestible.
 const cleanForSpeech = (s: string, maxChars = 350) => {
-  let t = cleanForDisplay(s);
-  t = t
+  const original = cleanForDisplay(s);
+  let t = original
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/`[^`]*`/g, " ")
     .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^\s*[-–—•]\s*/gm, "")
-    .replace(/\*[^*]{0,80}\*/g, " ")
-    .replace(/\([^)]{0,80}\)/g, " ")
-    .replace(/[*_~>#-]+/g, " ")
-    .replace(/\b(?:parle|répond|يتحدث|تتحدث|speaks?|speaking)\s+(?:en|بال|in)\s+[\p{L}\p{M} -]+/giu, " ")
+    .replace(/\*([^*\n]{1,120})\*/g, " ")
+    .replace(/[*_~>#]+/g, " ")
     .replace(/\p{Extended_Pictographic}/gu, "")
     .replace(/\s+/g, " ")
     .trim();
+  // Safety net: if our cleaning ate everything, fall back to the raw display text
+  if (!t) t = original.replace(/\s+/g, " ").trim();
   if (t.length > maxChars) {
     const slice = t.slice(0, maxChars);
-    const lastDot = Math.max(slice.lastIndexOf("."), slice.lastIndexOf("!"), slice.lastIndexOf("?"), slice.lastIndexOf("،"), slice.lastIndexOf("."));
+    const lastDot = Math.max(
+      slice.lastIndexOf("."),
+      slice.lastIndexOf("!"),
+      slice.lastIndexOf("?"),
+      slice.lastIndexOf("،"),
+    );
     t = (lastDot > 80 ? slice.slice(0, lastDot + 1) : slice).trim();
   }
   return t;
 };
+
+// Pick best TTS lang based on what the AI actually wrote, so we don't read
+// Arabic with a French voice (or vice-versa).
+const detectLangCode = (text: string, fallback: string): string => {
+  const sample = text.slice(0, 400);
+  if (/[\u0600-\u06FF]/.test(sample)) return "ar-SA";
+  if (/[\u4E00-\u9FFF]/.test(sample)) return "zh-CN";
+  if (/[\u3040-\u30FF]/.test(sample)) return "ja-JP";
+  if (/[\uAC00-\uD7AF]/.test(sample)) return "ko-KR";
+  if (/[\u0400-\u04FF]/.test(sample)) return "ru-RU";
+  // Latin scripts: keep the user's selected language
+  return fallback;
+};
+
 
 const parseEstimation = (s: string): { minutes: number; label: string } | null => {
   const m = s.match(/ESTIMATION:\s*(\d+)\s*min\s*-\s*(.+)/i);
@@ -320,27 +339,58 @@ const GameChat = () => {
     return acc;
   };
 
-  const speak = (text: string, lang: string) => {
-    if (!("speechSynthesis" in window)) return;
+  const speak = (text: string, requestedLang: string) => {
+    if (!("speechSynthesis" in window)) {
+      voiceProcessingRef.current = false;
+      if (voiceChatRef.current) startVoiceListen();
+      return;
+    }
     const spokenText = cleanForSpeech(text, 320);
     if (!spokenText) {
       voiceProcessingRef.current = false;
       if (voiceChatRef.current) startVoiceListen();
       return;
     }
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(spokenText.slice(0, 1200));
-    u.lang = lang;
-    const voices = window.speechSynthesis.getVoices?.() ?? [];
-    const matchingVoice = voices.find((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
-    if (matchingVoice) u.voice = matchingVoice;
-    u.rate = 1;
-    u.onend = () => {
-      voiceProcessingRef.current = false;
-      if (voiceChatRef.current) startVoiceListen();
+    // Use the language the AI actually wrote in, not just the UI selection
+    const lang = detectLangCode(spokenText, requestedLang);
+    const doSpeak = () => {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(spokenText.slice(0, 1200));
+      u.lang = lang;
+      const voices = window.speechSynthesis.getVoices?.() ?? [];
+      const prefix = lang.slice(0, 2).toLowerCase();
+      const matchingVoice =
+        voices.find((v) => v.lang.toLowerCase() === lang.toLowerCase()) ||
+        voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
+      if (matchingVoice) u.voice = matchingVoice;
+      u.rate = 1;
+      u.pitch = 1;
+      u.volume = 1;
+      u.onend = () => {
+        voiceProcessingRef.current = false;
+        if (voiceChatRef.current) startVoiceListen();
+      };
+      u.onerror = () => {
+        voiceProcessingRef.current = false;
+        if (voiceChatRef.current) startVoiceListen();
+      };
+      window.speechSynthesis.speak(u);
     };
-    window.speechSynthesis.speak(u);
+    // Voices may load async on first call
+    const voicesNow = window.speechSynthesis.getVoices?.() ?? [];
+    if (voicesNow.length === 0) {
+      const handler = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+      window.speechSynthesis.onvoiceschanged = handler;
+      // Fallback in case the event never fires
+      setTimeout(doSpeak, 250);
+    } else {
+      doSpeak();
+    }
   };
+
 
   const startVoiceListen = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
