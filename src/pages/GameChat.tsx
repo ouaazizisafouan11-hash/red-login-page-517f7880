@@ -133,6 +133,46 @@ const detectLangCode = (text: string, fallback: string): string => {
   return fallback;
 };
 
+const makeSpeechTextNatural = (text: string, lang: string) => {
+  const isArabic = lang.startsWith("ar");
+  const isFrench = lang.startsWith("fr");
+  return text
+    .replace(/\b3D\b/gi, isArabic ? "ثري دي" : isFrench ? "trois D" : "three D")
+    .replace(/\b2D\b/gi, isArabic ? "تو دي" : isFrench ? "deux D" : "two D")
+    .replace(/\bAI\b/g, isArabic ? "ذكاء اصطناعي" : isFrench ? "IA" : "A I")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const splitSpeechText = (text: string, maxChars = 220) => {
+  const sentences = text.match(/[^.!?؟،]+[.!?؟،]?/g) ?? [text];
+  const chunks: string[] = [];
+  let current = "";
+  for (const sentence of sentences) {
+    const next = `${current} ${sentence}`.trim();
+    if (next.length > maxChars && current) {
+      chunks.push(current);
+      current = sentence.trim();
+    } else {
+      current = next;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+};
+
+const unlockSpeechSynthesis = () => {
+  if (!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(" ");
+  u.volume = 0;
+  window.speechSynthesis.speak(u);
+};
+
+const prepareSpeechPool = (count = 8) =>
+  "speechSynthesis" in window
+    ? Array.from({ length: count }, () => new SpeechSynthesisUtterance())
+    : [];
+
 
 const parseEstimation = (s: string): { minutes: number; label: string } | null => {
   const m = s.match(/ESTIMATION:\s*(\d+)\s*min\s*-\s*(.+)/i);
@@ -176,6 +216,10 @@ const GameChat = () => {
   const voiceSilenceTimerRef = useRef<number | null>(null);
   const voiceTranscriptRef = useRef("");
   const voiceStartedRef = useRef(false);
+  const speechUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const preparedSpeechRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const preparedSpeechPoolRef = useRef<SpeechSynthesisUtterance[]>([]);
+  const speechKeepAliveRef = useRef<number | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -200,6 +244,10 @@ const GameChat = () => {
       safeStopRecognition(voiceRecRef.current);
       recognitionRef.current = null;
       voiceRecRef.current = null;
+      if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+      speechUtteranceRef.current = null;
+      preparedSpeechRef.current = null;
+      preparedSpeechPoolRef.current = [];
       try { window.speechSynthesis?.cancel(); } catch {}
     };
     window.addEventListener("beforeunload", stopEverything);
@@ -339,11 +387,15 @@ const GameChat = () => {
     return acc;
   };
 
-  const speak = (text: string, requestedLang: string) => {
+  const speak = (text: string, requestedLang: string, preparedUtterance?: SpeechSynthesisUtterance | null) => {
     if (!("speechSynthesis" in window)) {
       voiceProcessingRef.current = false;
       if (voiceChatRef.current) startVoiceListen();
       return;
+    }
+    if (speechKeepAliveRef.current) {
+      window.clearInterval(speechKeepAliveRef.current);
+      speechKeepAliveRef.current = null;
     }
     const spokenText = cleanForSpeech(text, 320);
     if (!spokenText) {
@@ -353,28 +405,53 @@ const GameChat = () => {
     }
     // Use the language the AI actually wrote in, not just the UI selection
     const lang = detectLangCode(spokenText, requestedLang);
+    const chunks = splitSpeechText(makeSpeechTextNatural(spokenText, lang));
+    let chunkIndex = 0;
     const doSpeak = () => {
       window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(spokenText.slice(0, 1200));
-      u.lang = lang;
       const voices = window.speechSynthesis.getVoices?.() ?? [];
       const prefix = lang.slice(0, 2).toLowerCase();
       const matchingVoice =
         voices.find((v) => v.lang.toLowerCase() === lang.toLowerCase()) ||
         voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
-      if (matchingVoice) u.voice = matchingVoice;
-      u.rate = 1;
-      u.pitch = 1;
-      u.volume = 1;
-      u.onend = () => {
-        voiceProcessingRef.current = false;
-        if (voiceChatRef.current) startVoiceListen();
+      const speakNext = () => {
+        if (!voiceChatRef.current || chunkIndex >= chunks.length) {
+          voiceProcessingRef.current = false;
+          speechUtteranceRef.current = null;
+          preparedSpeechRef.current = null;
+          if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+          speechKeepAliveRef.current = null;
+          if (voiceChatRef.current) startVoiceListen();
+          return;
+        }
+        const u = preparedSpeechPoolRef.current[chunkIndex] ?? (chunkIndex === 0 && preparedUtterance ? preparedUtterance : new SpeechSynthesisUtterance());
+        u.text = chunks[chunkIndex];
+        u.lang = lang;
+        if (matchingVoice) u.voice = matchingVoice;
+        u.rate = lang.startsWith("ar") ? 0.92 : 1;
+        u.pitch = 1;
+        u.volume = 1;
+        speechUtteranceRef.current = u;
+        u.onend = () => {
+          chunkIndex += 1;
+          speakNext();
+        };
+        u.onerror = () => {
+          voiceProcessingRef.current = false;
+          speechUtteranceRef.current = null;
+          if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+          speechKeepAliveRef.current = null;
+          if (voiceChatRef.current) startVoiceListen();
+        };
+        window.speechSynthesis.speak(u);
+        if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+        speechKeepAliveRef.current = window.setInterval(() => {
+          if (!window.speechSynthesis.speaking || window.speechSynthesis.paused) return;
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        }, 9000);
       };
-      u.onerror = () => {
-        voiceProcessingRef.current = false;
-        if (voiceChatRef.current) startVoiceListen();
-      };
-      window.speechSynthesis.speak(u);
+      speakNext();
     };
     // Voices may load async on first call
     const voicesNow = window.speechSynthesis.getVoices?.() ?? [];
@@ -395,6 +472,7 @@ const GameChat = () => {
   const startVoiceListen = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) return;
+    if (voiceProcessingRef.current) return;
     if (voiceRecRef.current) {
       try { voiceRecRef.current.stop(); } catch {}
     }
@@ -415,9 +493,10 @@ const GameChat = () => {
       try { rec.stop(); } catch {}
       const reply = await send(transcript, "voice");
       if (voiceChatRef.current && reply) {
-        speak(reply, lang);
+        speak(reply, lang, preparedSpeechRef.current);
       } else {
         voiceProcessingRef.current = false;
+        preparedSpeechRef.current = null;
         if (voiceChatRef.current) setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
       }
     };
@@ -445,7 +524,7 @@ const GameChat = () => {
     };
     rec.onend = () => {
       // restart if still in voice mode and not currently speaking/loading
-      if (voiceChatRef.current && !voiceProcessingRef.current && !window.speechSynthesis?.speaking) {
+      if (voiceChatRef.current && !voiceProcessingRef.current) {
         const transcript = normalizeArabicSpeech(voiceTranscriptRef.current);
         if (transcript) void submitTranscript();
         else setTimeout(() => voiceChatRef.current && startVoiceListen(), voiceStartedRef.current ? 300 : 800);
@@ -470,6 +549,10 @@ const GameChat = () => {
       if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
       setVoiceChat(false);
       try { voiceRecRef.current?.stop(); } catch {}
+      if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+      speechUtteranceRef.current = null;
+      preparedSpeechRef.current = null;
+      preparedSpeechPoolRef.current = [];
       window.speechSynthesis?.cancel();
       toast.info("📞 Appel terminé.");
       return;
@@ -477,6 +560,9 @@ const GameChat = () => {
     voiceChatRef.current = true;
     voiceProcessingRef.current = false;
     voiceTranscriptRef.current = "";
+    preparedSpeechRef.current = "speechSynthesis" in window ? new SpeechSynthesisUtterance() : null;
+    preparedSpeechPoolRef.current = prepareSpeechPool();
+    unlockSpeechSynthesis();
     if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
     setVoiceChat(true);
     toast.success(`📞 Mode conversation activé — parle en ${SPEECH_LANGUAGES.find((l) => l.code === speechLangRef.current)?.label ?? speechLangRef.current}.`);
@@ -491,6 +577,9 @@ const GameChat = () => {
       voiceProcessingRef.current = false;
       voiceTranscriptRef.current = "";
       if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
+      if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+      preparedSpeechRef.current = "speechSynthesis" in window ? new SpeechSynthesisUtterance() : null;
+      preparedSpeechPoolRef.current = prepareSpeechPool();
       window.speechSynthesis?.cancel();
       setTimeout(() => startVoiceListen(), 250);
     }
