@@ -578,6 +578,8 @@ const GameChat = () => {
       voiceTranscriptRef.current = "";
       if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
       if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+      preparedSpeechRef.current = "speechSynthesis" in window ? new SpeechSynthesisUtterance() : null;
+      preparedSpeechPoolRef.current = prepareSpeechPool();
       window.speechSynthesis?.cancel();
       setTimeout(() => startVoiceListen(), 250);
     }
