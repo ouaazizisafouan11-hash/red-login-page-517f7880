@@ -133,6 +133,34 @@ const detectLangCode = (text: string, fallback: string): string => {
   return fallback;
 };
 
+const makeSpeechTextNatural = (text: string, lang: string) => {
+  const isArabic = lang.startsWith("ar");
+  const isFrench = lang.startsWith("fr");
+  return text
+    .replace(/\b3D\b/gi, isArabic ? "ثري دي" : isFrench ? "trois D" : "three D")
+    .replace(/\b2D\b/gi, isArabic ? "تو دي" : isFrench ? "deux D" : "two D")
+    .replace(/\bAI\b/g, isArabic ? "ذكاء اصطناعي" : isFrench ? "IA" : "A I")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const splitSpeechText = (text: string, maxChars = 220) => {
+  const sentences = text.match(/[^.!?؟،]+[.!?؟،]?/g) ?? [text];
+  const chunks: string[] = [];
+  let current = "";
+  for (const sentence of sentences) {
+    const next = `${current} ${sentence}`.trim();
+    if (next.length > maxChars && current) {
+      chunks.push(current);
+      current = sentence.trim();
+    } else {
+      current = next;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+};
+
 
 const parseEstimation = (s: string): { minutes: number; label: string } | null => {
   const m = s.match(/ESTIMATION:\s*(\d+)\s*min\s*-\s*(.+)/i);
