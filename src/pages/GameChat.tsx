@@ -427,6 +427,7 @@ const GameChat = () => {
           if (voiceChatRef.current) startVoiceListen();
         };
         window.speechSynthesis.speak(u);
+        if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
         speechKeepAliveRef.current = window.setInterval(() => {
           if (!window.speechSynthesis.speaking || window.speechSynthesis.paused) return;
           window.speechSynthesis.pause();
