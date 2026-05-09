@@ -465,7 +465,7 @@ const GameChat = () => {
   const startVoiceListen = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) return;
-    if (voiceProcessingRef.current || window.speechSynthesis?.speaking) return;
+    if (voiceProcessingRef.current) return;
     if (voiceRecRef.current) {
       try { voiceRecRef.current.stop(); } catch {}
     }
@@ -517,7 +517,7 @@ const GameChat = () => {
     };
     rec.onend = () => {
       // restart if still in voice mode and not currently speaking/loading
-      if (voiceChatRef.current && !voiceProcessingRef.current && !window.speechSynthesis?.speaking) {
+      if (voiceChatRef.current && !voiceProcessingRef.current) {
         const transcript = normalizeArabicSpeech(voiceTranscriptRef.current);
         if (transcript) void submitTranscript();
         else setTimeout(() => voiceChatRef.current && startVoiceListen(), voiceStartedRef.current ? 300 : 800);
