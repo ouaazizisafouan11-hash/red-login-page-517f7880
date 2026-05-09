@@ -431,6 +431,9 @@ const GameChat = () => {
         };
         u.onerror = () => {
           voiceProcessingRef.current = false;
+          speechUtteranceRef.current = null;
+          if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+          speechKeepAliveRef.current = null;
           if (voiceChatRef.current) startVoiceListen();
         };
         window.speechSynthesis.speak(u);
@@ -539,6 +542,9 @@ const GameChat = () => {
       if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
       setVoiceChat(false);
       try { voiceRecRef.current?.stop(); } catch {}
+      if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+      speechUtteranceRef.current = null;
+      preparedSpeechRef.current = null;
       window.speechSynthesis?.cancel();
       toast.info("📞 Appel terminé.");
       return;
@@ -562,6 +568,7 @@ const GameChat = () => {
       voiceProcessingRef.current = false;
       voiceTranscriptRef.current = "";
       if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
+      if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
       window.speechSynthesis?.cancel();
       setTimeout(() => startVoiceListen(), 250);
     }
