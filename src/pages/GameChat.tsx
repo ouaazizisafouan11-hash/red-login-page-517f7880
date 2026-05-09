@@ -480,7 +480,6 @@ const GameChat = () => {
       if (!transcript || voiceProcessingRef.current || !voiceChatRef.current) return;
       const lang = speechLangRef.current;
       voiceProcessingRef.current = true;
-      preparedSpeechRef.current = "speechSynthesis" in window ? new SpeechSynthesisUtterance() : null;
       try { rec.stop(); } catch {}
       const reply = await send(transcript, "voice");
       if (voiceChatRef.current && reply) {
