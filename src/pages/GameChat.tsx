@@ -552,6 +552,7 @@ const GameChat = () => {
       if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
       speechUtteranceRef.current = null;
       preparedSpeechRef.current = null;
+      preparedSpeechPoolRef.current = [];
       window.speechSynthesis?.cancel();
       toast.info("📞 Appel terminé.");
       return;
@@ -560,6 +561,7 @@ const GameChat = () => {
     voiceProcessingRef.current = false;
     voiceTranscriptRef.current = "";
     preparedSpeechRef.current = "speechSynthesis" in window ? new SpeechSynthesisUtterance() : null;
+    preparedSpeechPoolRef.current = prepareSpeechPool();
     unlockSpeechSynthesis();
     if (voiceSilenceTimerRef.current) window.clearTimeout(voiceSilenceTimerRef.current);
     setVoiceChat(true);
