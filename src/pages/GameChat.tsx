@@ -455,6 +455,7 @@ const GameChat = () => {
   const startVoiceListen = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) return;
+    if (voiceProcessingRef.current || window.speechSynthesis?.speaking) return;
     if (voiceRecRef.current) {
       try { voiceRecRef.current.stop(); } catch {}
     }
@@ -472,12 +473,14 @@ const GameChat = () => {
       if (!transcript || voiceProcessingRef.current || !voiceChatRef.current) return;
       const lang = speechLangRef.current;
       voiceProcessingRef.current = true;
+      preparedSpeechRef.current = "speechSynthesis" in window ? new SpeechSynthesisUtterance() : null;
       try { rec.stop(); } catch {}
       const reply = await send(transcript, "voice");
       if (voiceChatRef.current && reply) {
-        speak(reply, lang);
+        speak(reply, lang, preparedSpeechRef.current);
       } else {
         voiceProcessingRef.current = false;
+        preparedSpeechRef.current = null;
         if (voiceChatRef.current) setTimeout(() => voiceChatRef.current && startVoiceListen(), 300);
       }
     };
