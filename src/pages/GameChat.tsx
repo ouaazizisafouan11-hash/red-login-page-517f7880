@@ -339,27 +339,58 @@ const GameChat = () => {
     return acc;
   };
 
-  const speak = (text: string, lang: string) => {
-    if (!("speechSynthesis" in window)) return;
+  const speak = (text: string, requestedLang: string) => {
+    if (!("speechSynthesis" in window)) {
+      voiceProcessingRef.current = false;
+      if (voiceChatRef.current) startVoiceListen();
+      return;
+    }
     const spokenText = cleanForSpeech(text, 320);
     if (!spokenText) {
       voiceProcessingRef.current = false;
       if (voiceChatRef.current) startVoiceListen();
       return;
     }
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(spokenText.slice(0, 1200));
-    u.lang = lang;
-    const voices = window.speechSynthesis.getVoices?.() ?? [];
-    const matchingVoice = voices.find((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
-    if (matchingVoice) u.voice = matchingVoice;
-    u.rate = 1;
-    u.onend = () => {
-      voiceProcessingRef.current = false;
-      if (voiceChatRef.current) startVoiceListen();
+    // Use the language the AI actually wrote in, not just the UI selection
+    const lang = detectLangCode(spokenText, requestedLang);
+    const doSpeak = () => {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(spokenText.slice(0, 1200));
+      u.lang = lang;
+      const voices = window.speechSynthesis.getVoices?.() ?? [];
+      const prefix = lang.slice(0, 2).toLowerCase();
+      const matchingVoice =
+        voices.find((v) => v.lang.toLowerCase() === lang.toLowerCase()) ||
+        voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
+      if (matchingVoice) u.voice = matchingVoice;
+      u.rate = 1;
+      u.pitch = 1;
+      u.volume = 1;
+      u.onend = () => {
+        voiceProcessingRef.current = false;
+        if (voiceChatRef.current) startVoiceListen();
+      };
+      u.onerror = () => {
+        voiceProcessingRef.current = false;
+        if (voiceChatRef.current) startVoiceListen();
+      };
+      window.speechSynthesis.speak(u);
     };
-    window.speechSynthesis.speak(u);
+    // Voices may load async on first call
+    const voicesNow = window.speechSynthesis.getVoices?.() ?? [];
+    if (voicesNow.length === 0) {
+      const handler = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+      window.speechSynthesis.onvoiceschanged = handler;
+      // Fallback in case the event never fires
+      setTimeout(doSpeak, 250);
+    } else {
+      doSpeak();
+    }
   };
+
 
   const startVoiceListen = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
