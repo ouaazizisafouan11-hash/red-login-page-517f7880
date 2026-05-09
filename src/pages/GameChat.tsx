@@ -168,6 +168,11 @@ const unlockSpeechSynthesis = () => {
   window.speechSynthesis.speak(u);
 };
 
+const prepareSpeechPool = (count = 8) =>
+  "speechSynthesis" in window
+    ? Array.from({ length: count }, () => new SpeechSynthesisUtterance())
+    : [];
+
 
 const parseEstimation = (s: string): { minutes: number; label: string } | null => {
   const m = s.match(/ESTIMATION:\s*(\d+)\s*min\s*-\s*(.+)/i);
