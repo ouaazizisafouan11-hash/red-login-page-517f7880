@@ -8,14 +8,21 @@ import GameChat from "./pages/GameChat.tsx";
 import GameLibrary from "./pages/GameLibrary.tsx";
 import GamePlay from "./pages/GamePlay.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { useGameReadyNotifications } from "./hooks/useGameReadyNotifications";
 
 const queryClient = new QueryClient();
+
+const GlobalNotifications = () => {
+  useGameReadyNotifications();
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <GlobalNotifications />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
