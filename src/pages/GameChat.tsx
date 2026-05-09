@@ -373,11 +373,15 @@ const GameChat = () => {
     return acc;
   };
 
-  const speak = (text: string, requestedLang: string) => {
+  const speak = (text: string, requestedLang: string, preparedUtterance?: SpeechSynthesisUtterance | null) => {
     if (!("speechSynthesis" in window)) {
       voiceProcessingRef.current = false;
       if (voiceChatRef.current) startVoiceListen();
       return;
+    }
+    if (speechKeepAliveRef.current) {
+      window.clearInterval(speechKeepAliveRef.current);
+      speechKeepAliveRef.current = null;
     }
     const spokenText = cleanForSpeech(text, 320);
     if (!spokenText) {
@@ -399,15 +403,21 @@ const GameChat = () => {
       const speakNext = () => {
         if (!voiceChatRef.current || chunkIndex >= chunks.length) {
           voiceProcessingRef.current = false;
+          speechUtteranceRef.current = null;
+          preparedSpeechRef.current = null;
+          if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+          speechKeepAliveRef.current = null;
           if (voiceChatRef.current) startVoiceListen();
           return;
         }
-        const u = new SpeechSynthesisUtterance(chunks[chunkIndex]);
+        const u = chunkIndex === 0 && preparedUtterance ? preparedUtterance : new SpeechSynthesisUtterance();
+        u.text = chunks[chunkIndex];
         u.lang = lang;
         if (matchingVoice) u.voice = matchingVoice;
         u.rate = lang.startsWith("ar") ? 0.92 : 1;
         u.pitch = 1;
         u.volume = 1;
+        speechUtteranceRef.current = u;
         u.onend = () => {
           chunkIndex += 1;
           speakNext();
@@ -417,6 +427,11 @@ const GameChat = () => {
           if (voiceChatRef.current) startVoiceListen();
         };
         window.speechSynthesis.speak(u);
+        speechKeepAliveRef.current = window.setInterval(() => {
+          if (!window.speechSynthesis.speaking || window.speechSynthesis.paused) return;
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        }, 9000);
       };
       speakNext();
     };
