@@ -204,6 +204,9 @@ const GameChat = () => {
   const voiceSilenceTimerRef = useRef<number | null>(null);
   const voiceTranscriptRef = useRef("");
   const voiceStartedRef = useRef(false);
+  const speechUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const preparedSpeechRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const speechKeepAliveRef = useRef<number | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -228,6 +231,9 @@ const GameChat = () => {
       safeStopRecognition(voiceRecRef.current);
       recognitionRef.current = null;
       voiceRecRef.current = null;
+      if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
+      speechUtteranceRef.current = null;
+      preparedSpeechRef.current = null;
       try { window.speechSynthesis?.cancel(); } catch {}
     };
     window.addEventListener("beforeunload", stopEverything);
