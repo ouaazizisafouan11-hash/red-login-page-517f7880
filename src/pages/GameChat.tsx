@@ -424,7 +424,7 @@ const GameChat = () => {
           if (voiceChatRef.current) startVoiceListen();
           return;
         }
-        const u = chunkIndex === 0 && preparedUtterance ? preparedUtterance : new SpeechSynthesisUtterance();
+        const u = preparedSpeechPoolRef.current[chunkIndex] ?? (chunkIndex === 0 && preparedUtterance ? preparedUtterance : new SpeechSynthesisUtterance());
         u.text = chunks[chunkIndex];
         u.lang = lang;
         if (matchingVoice) u.voice = matchingVoice;
