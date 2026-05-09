@@ -213,6 +213,7 @@ const GameChat = () => {
   const voiceStartedRef = useRef(false);
   const speechUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const preparedSpeechRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const preparedSpeechPoolRef = useRef<SpeechSynthesisUtterance[]>([]);
   const speechKeepAliveRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -241,6 +242,7 @@ const GameChat = () => {
       if (speechKeepAliveRef.current) window.clearInterval(speechKeepAliveRef.current);
       speechUtteranceRef.current = null;
       preparedSpeechRef.current = null;
+      preparedSpeechPoolRef.current = [];
       try { window.speechSynthesis?.cancel(); } catch {}
     };
     window.addEventListener("beforeunload", stopEverything);
