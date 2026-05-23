@@ -7,7 +7,6 @@ const Accueil = () => {
     (user?.user_metadata?.username as string | undefined) ??
     user?.email?.split("@")[0] ??
     "Utilisateur";
-
   return (
     <main className="relative min-h-screen overflow-hidden px-4 py-10">
       <div className="relative z-10 mx-auto max-w-2xl space-y-6">
