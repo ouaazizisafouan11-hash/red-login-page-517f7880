@@ -101,9 +101,9 @@ const GameLibrary = () => {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-6">
       <header className="mb-6 flex items-center justify-between gap-2">
-        <Button variant="outline" size="sm" onClick={() => navigate("/chat")} className="gap-1.5">
+        <Button variant="outline" size="sm" onClick={() => navigate("/")} className="gap-1.5">
           <ArrowLeft className="h-4 w-4" />
-          Retour au chat
+          Accueil
         </Button>
         <h1 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-xl font-extrabold text-transparent sm:text-2xl">
           🎮 Mes jeux
