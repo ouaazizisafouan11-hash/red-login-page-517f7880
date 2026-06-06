@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { useInView } from "@/hooks/useInView";
 
 const WELCOME =
@@ -32,9 +30,6 @@ const Index = () => {
         <h2 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-2xl font-extrabold tracking-tight text-transparent drop-shadow-sm sm:text-3xl md:text-4xl">
           Adnane The King
         </h2>
-        <Button asChild className="h-10 px-5 text-sm sm:h-11 sm:px-6 sm:text-base">
-          <Link to="/play/demo">Entrer 🎮</Link>
-        </Button>
       </div>
 
       <AnimatedSection className="flex min-h-[40vh] items-center justify-center">
@@ -66,18 +61,6 @@ const Index = () => {
             {WELCOME}
           </p>
         </div>
-      </AnimatedSection>
-
-      <AnimatedSection className="mx-auto max-w-2xl text-center">
-        <Link
-          to="/play/demo"
-          className="inline-block rounded-lg bg-primary px-8 py-4 text-lg font-bold text-primary-foreground hover:bg-primary/80"
-        >
-          🎮 Jouer
-        </Link>
-        <p className="mt-3 text-sm text-accent">
-          Aucun email, aucune inscription. Joue directement.
-        </p>
       </AnimatedSection>
     </main>
   );
