@@ -51,9 +51,9 @@ const GamePlay = () => {
   return (
     <main className="flex min-h-screen flex-col">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3">
-        <Button variant="outline" size="sm" onClick={() => navigate("/games")} className="gap-1.5">
+        <Button variant="outline" size="sm" onClick={() => navigate("/")} className="gap-1.5">
           <ArrowLeft className="h-4 w-4" />
-          Mes jeux
+          Accueil
         </Button>
         <h1 className="truncate bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-base font-bold text-transparent sm:text-xl">
           🎮 {game.title}

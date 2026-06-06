@@ -33,7 +33,7 @@ const Index = () => {
           Adnane The King
         </h2>
         <Button asChild className="h-10 px-5 text-sm sm:h-11 sm:px-6 sm:text-base">
-          <Link to="/games">Entrer 🎮</Link>
+          <Link to="/play/demo">Entrer 🎮</Link>
         </Button>
       </div>
 
@@ -70,13 +70,13 @@ const Index = () => {
 
       <AnimatedSection className="mx-auto max-w-2xl text-center">
         <Link
-          to="/games"
+          to="/play/demo"
           className="inline-block rounded-lg bg-primary px-8 py-4 text-lg font-bold text-primary-foreground hover:bg-primary/80"
         >
-          🎮 Voir mes jeux
+          🎮 Jouer
         </Link>
         <p className="mt-3 text-sm text-accent">
-          Aucun email, aucune inscription. Découvre et joue directement.
+          Aucun email, aucune inscription. Joue directement.
         </p>
       </AnimatedSection>
     </main>
