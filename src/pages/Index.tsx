@@ -22,14 +22,11 @@ const AnimatedSection = ({
 };
 
 const Index = () => {
-  const text = "I'm the best in coding";
+  const text = "عدنان وعزيزي";
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-2xl font-extrabold tracking-tight text-transparent drop-shadow-sm sm:text-3xl md:text-4xl">
-          Adnane The King
-        </h2>
       </div>
 
       <AnimatedSection className="flex min-h-[40vh] items-center justify-center">
