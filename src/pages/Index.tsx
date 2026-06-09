@@ -26,8 +26,6 @@ const Index = () => {
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
-      <div className="mb-6 flex items-center justify-between">
-      </div>
 
       <AnimatedSection className="flex min-h-[40vh] items-center justify-center">
         <h1
