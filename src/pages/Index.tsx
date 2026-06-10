@@ -57,6 +57,35 @@ const Index = () => {
           </p>
         </div>
       </AnimatedSection>
+
+      <AnimatedSection className="mx-auto max-w-3xl">
+        <div
+          className="relative rounded-lg bg-card p-6 sm:p-8"
+          style={{ boxShadow: "var(--shadow-glow)" }}
+        >
+          <h2 className="mb-6 text-center text-xl font-bold text-primary sm:text-2xl">
+            My Personal Information
+          </h2>
+          <ul className="space-y-3 text-lg text-foreground">
+            <li className="flex items-center gap-3">
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+              <span><strong>First Name:</strong> Adnane</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+              <span><strong>Last Name:</strong> Ouaazizi</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+              <span><strong>City/Country:</strong> Morocco</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+              <span><strong>Email:</strong> (waiting for you to provide it)</span>
+            </li>
+          </ul>
+        </div>
+      </AnimatedSection>
     </main>
   );
 };
