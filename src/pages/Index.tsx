@@ -81,7 +81,7 @@ const Index = () => {
             </li>
             <li className="flex items-center gap-3">
               <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-              <span><strong>Email:</strong> (waiting for you to provide it)</span>
+              <span><strong>Email:</strong> ouaazizisafouan11@gmail.com</span>
             </li>
           </ul>
         </div>
