@@ -22,7 +22,7 @@ const AnimatedSection = ({
 };
 
 const Index = () => {
-  const text = "عدنان وعزيزي";
+  const text = "Adnane and Azizi";
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
