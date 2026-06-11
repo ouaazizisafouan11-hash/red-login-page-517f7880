@@ -21,15 +21,22 @@ const AnimatedSection = ({
   );
 };
 
+const GoldDivider = ({ ornament = "✦" }: { ornament?: string }) => (
+  <div className="gold-divider my-6 text-lg">
+    <span className="font-script text-2xl text-accent">{ornament}</span>
+  </div>
+);
+
 const Index = () => {
   const text = "Adnane Ouaazizi";
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-10">
 
-      <AnimatedSection className="flex min-h-[40vh] items-center justify-center">
+      <AnimatedSection className="flex min-h-[40vh] flex-col items-center justify-center">
+        <p className="font-script mb-2 text-3xl text-accent/90 sm:text-4xl">Welcome</p>
         <h1
-          className="text-glow text-center text-2xl font-extrabold tracking-tight text-primary sm:text-3xl md:text-4xl"
+          className="text-glow font-display text-center text-3xl font-bold tracking-wide text-gold-gradient sm:text-5xl md:text-6xl"
           aria-label={text}
         >
           {text.split("").map((char, i) => (
@@ -45,14 +52,15 @@ const Index = () => {
             </span>
           ))}
         </h1>
+        <GoldDivider ornament="❧" />
       </AnimatedSection>
 
       <AnimatedSection className="mx-auto mb-10 max-w-3xl">
         <div
-          className="relative rounded-lg bg-card p-6 sm:p-8"
+          className="relative rounded-lg border border-border/60 bg-card/80 p-6 backdrop-blur-sm sm:p-8"
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
-          <p className="text-glow text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
+          <p className="font-serif-elegant text-glow text-center text-2xl font-medium italic leading-relaxed text-accent sm:text-3xl md:text-4xl">
             {WELCOME}
           </p>
         </div>
@@ -60,28 +68,29 @@ const Index = () => {
 
       <AnimatedSection className="mx-auto max-w-3xl">
         <div
-          className="relative rounded-lg bg-card p-6 sm:p-8"
+          className="relative rounded-lg border border-border/60 bg-card/80 p-6 backdrop-blur-sm sm:p-8"
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
-          <h2 className="text-glow mb-6 text-center text-xl font-bold text-primary sm:text-2xl">
+          <h2 className="text-glow font-display mb-2 text-center text-2xl font-bold tracking-wide text-gold-gradient sm:text-3xl">
             My Personal Information
           </h2>
-          <ul className="space-y-3 text-lg text-foreground">
+          <GoldDivider ornament="✦" />
+          <ul className="space-y-4 font-serif-elegant text-xl text-foreground sm:text-2xl">
             <li className="flex items-center gap-3">
-              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-              <span><strong>First Name:</strong> Adnane</span>
+              <span className="font-script text-2xl text-accent">✧</span>
+              <span><strong className="font-display text-lg tracking-wide text-primary">First Name:</strong> Adnane</span>
             </li>
             <li className="flex items-center gap-3">
-              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-              <span><strong>Last Name:</strong> Ouaazizi</span>
+              <span className="font-script text-2xl text-accent">✧</span>
+              <span><strong className="font-display text-lg tracking-wide text-primary">Last Name:</strong> Ouaazizi</span>
             </li>
             <li className="flex items-center gap-3">
-              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-              <span><strong>City/Country:</strong> Morocco</span>
+              <span className="font-script text-2xl text-accent">✧</span>
+              <span><strong className="font-display text-lg tracking-wide text-primary">City/Country:</strong> Morocco</span>
             </li>
             <li className="flex items-center gap-3">
-              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
-              <span><strong>Email:</strong> ouaazizisafouan11@gmail.com</span>
+              <span className="font-script text-2xl text-accent">✧</span>
+              <span><strong className="font-display text-lg tracking-wide text-primary">Email:</strong> ouaazizisafouan11@gmail.com</span>
             </li>
           </ul>
         </div>
