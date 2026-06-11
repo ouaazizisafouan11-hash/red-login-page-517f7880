@@ -110,3 +110,34 @@ All colors MUST be HSL.
   }
 }
 
+/* Toux doux et chaleureux derrière le texte doré */
+@keyframes gold-soft-glow {
+  0%, 100% {
+    text-shadow: 0 0 8px hsl(43 80% 55% / 0.25), 0 0 18px hsl(43 80% 50% / 0.12);
+  }
+  50% {
+    text-shadow: 0 0 14px hsl(44 85% 60% / 0.45), 0 0 30px hsl(43 80% 55% / 0.25);
+  }
+}
+
+@keyframes soft-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-soft-reveal {
+  animation: soft-reveal 0.8s ease-out both;
+}
+
+/* Lueur dorée douce et élégante sur les titres */
+.text-glow {
+  animation: gold-soft-glow 4s ease-in-out infinite;
+}
+
+
