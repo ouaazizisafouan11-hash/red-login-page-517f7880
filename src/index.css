@@ -155,4 +155,62 @@ All colors MUST be HSL.
   animation: gold-soft-glow 4s ease-in-out infinite;
 }
 
+/* Texte doré dégradé, riche et brillant */
+.text-gold-gradient {
+  background: linear-gradient(
+    100deg,
+    hsl(40 70% 48%) 0%,
+    hsl(45 90% 68%) 25%,
+    hsl(48 95% 78%) 45%,
+    hsl(43 88% 60%) 60%,
+    hsl(38 70% 46%) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: gold-shimmer 6s linear infinite;
+}
+
+@keyframes gold-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Police calligraphique pour accents décoratifs */
+.font-script {
+  font-family: "Great Vibes", cursive;
+}
+
+.font-display {
+  font-family: "Cinzel", serif;
+}
+
+.font-serif-elegant {
+  font-family: "Cormorant Garamond", Georgia, serif;
+}
+
+/* Petit séparateur décoratif doré */
+.gold-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: hsl(43 80% 58%);
+}
+
+.gold-divider::before,
+.gold-divider::after {
+  content: "";
+  height: 1px;
+  width: 3rem;
+  background: linear-gradient(90deg, transparent, hsl(43 80% 55% / 0.8));
+}
+
+.gold-divider::after {
+  background: linear-gradient(90deg, hsl(43 80% 55% / 0.8), transparent);
+}
+
 
