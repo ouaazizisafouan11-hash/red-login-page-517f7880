@@ -29,7 +29,7 @@ const Index = () => {
 
       <AnimatedSection className="flex min-h-[40vh] items-center justify-center">
         <h1
-          className="text-center text-2xl font-extrabold tracking-tight text-primary sm:text-3xl md:text-4xl"
+          className="text-glow text-center text-2xl font-extrabold tracking-tight text-primary sm:text-3xl md:text-4xl"
           aria-label={text}
         >
           {text.split("").map((char, i) => (
@@ -52,7 +52,7 @@ const Index = () => {
           className="relative rounded-lg bg-card p-6 sm:p-8"
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
-          <p className="text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
+          <p className="text-glow text-center text-2xl font-semibold leading-relaxed text-accent sm:text-3xl md:text-4xl">
             {WELCOME}
           </p>
         </div>
@@ -63,7 +63,7 @@ const Index = () => {
           className="relative rounded-lg bg-card p-6 sm:p-8"
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
-          <h2 className="mb-6 text-center text-xl font-bold text-primary sm:text-2xl">
+          <h2 className="text-glow mb-6 text-center text-xl font-bold text-primary sm:text-2xl">
             My Personal Information
           </h2>
           <ul className="space-y-3 text-lg text-foreground">
