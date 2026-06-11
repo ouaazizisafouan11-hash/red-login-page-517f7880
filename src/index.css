@@ -100,14 +100,29 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    /* Fond noir profond enrichi de douces lueurs dorées */
+    background-color: hsl(0 0% 0%);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, hsl(43 80% 55% / 0.18), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 10% 20%, hsl(40 75% 45% / 0.10), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 90% 80%, hsl(45 80% 55% / 0.10), transparent 55%),
+      radial-gradient(circle at 50% 120%, hsl(38 70% 40% / 0.12), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3 {
+    font-family: "Cinzel", "Cormorant Garamond", serif;
+    letter-spacing: 0.04em;
   }
 
   /* Les conteneurs de pages utilisent bg-background : on les rend transparents
-     pour laisser apparaître le fond noir du <html>/<body> */
+     pour laisser apparaître le fond doré du <body> */
   main.bg-background,
   .bg-background {
     background-color: transparent !important;
   }
+
 }
 
 /* Toux doux et chaleureux derrière le texte doré */
