@@ -11,24 +11,28 @@ const Index = () => {
       <GoldNav />
 
       <AnimatedSection className="flex min-h-[40vh] flex-col items-center justify-center">
-        <p className="font-script mb-2 text-3xl text-accent/90 sm:text-4xl">Welcome</p>
-        <h1
-          className="text-glow font-display text-center text-3xl font-bold tracking-wide text-gold-gradient sm:text-5xl md:text-6xl"
-          aria-label={text}
-        >
-          {text.split("").map((char, i) => (
-            <span
-              key={i}
-              className="inline-block animate-fade-in"
-              style={{
-                animationDelay: `${i * 80}ms`,
-                animationFillMode: "both",
-              }}
-            >
-              {char === " " ? "\u00A0" : char}
-            </span>
-          ))}
-        </h1>
+        <div className="text-center">
+          <p className="font-script mb-1 text-2xl text-accent/90 sm:text-3xl">
+            Welcome to
+          </p>
+          <h1
+            className="text-glow font-display text-center text-3xl font-bold tracking-wide text-gold-gradient sm:text-5xl md:text-6xl"
+            aria-label={text}
+          >
+            {(text + " website").split("").map((char, i) => (
+              <span
+                key={i}
+                className="inline-block animate-fade-in"
+                style={{
+                  animationDelay: `${i * 80}ms`,
+                  animationFillMode: "both",
+                }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
+          </h1>
+        </div>
         <GoldDivider ornament="❧" />
       </AnimatedSection>
 
