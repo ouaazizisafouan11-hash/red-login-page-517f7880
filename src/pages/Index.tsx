@@ -41,6 +41,7 @@ const Index = () => {
           className="relative rounded-lg border border-border/60 bg-card/80 p-6 backdrop-blur-sm sm:p-8"
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
+          <GoldCorners />
           <p className="font-serif-elegant text-glow text-center text-2xl font-medium italic leading-relaxed text-accent sm:text-3xl md:text-4xl">
             {WELCOME}
           </p>
