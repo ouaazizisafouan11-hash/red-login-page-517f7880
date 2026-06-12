@@ -9,6 +9,7 @@ import Dreams from "./pages/Dreams.tsx";
 import GamePlay from "./pages/GamePlay.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { useGameReadyNotifications } from "./hooks/useGameReadyNotifications";
+import { PageTransition } from "./components/GoldUI";
 
 const queryClient = new QueryClient();
 
