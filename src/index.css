@@ -150,6 +150,98 @@ All colors MUST be HSL.
   animation: soft-reveal 0.8s ease-out both;
 }
 
+/* Transition élégante lors du passage d'une page à l'autre */
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+    filter: blur(6px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Voile doré qui balaie l'écran au changement de page */
+@keyframes gold-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  35% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.gold-sweep {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    hsl(44 85% 60% / 0.06) 35%,
+    hsl(46 95% 72% / 0.22) 50%,
+    hsl(44 85% 60% / 0.06) 65%,
+    transparent 100%
+  );
+  animation: gold-sweep 0.9s ease-in-out both;
+}
+
+/* Particules dorées flottantes en arrière-plan */
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-40px) translateX(14px);
+  }
+  100% {
+    transform: translateY(-80px) translateX(0);
+    opacity: 0;
+  }
+}
+
+.gold-particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, hsl(46 95% 72% / 0.9), hsl(43 80% 55% / 0));
+  animation: float-particle linear infinite;
+}
+
+/* Coins ornementaux dorés autour des cartes */
+.gold-corner {
+  position: absolute;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-color: hsl(43 80% 58% / 0.7);
+  border-style: solid;
+  border-width: 0;
+}
+.gold-corner-tl { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 0.5rem; }
+.gold-corner-tr { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 0.5rem; }
+.gold-corner-bl { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 0.5rem; }
+.gold-corner-br { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 0.5rem; }
+
 /* Lueur dorée douce et élégante sur les titres */
 .text-glow {
   animation: gold-soft-glow 4s ease-in-out infinite;
