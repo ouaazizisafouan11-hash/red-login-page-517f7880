@@ -9,6 +9,7 @@ import Dreams from "./pages/Dreams.tsx";
 import GamePlay from "./pages/GamePlay.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { useGameReadyNotifications } from "./hooks/useGameReadyNotifications";
+import { PageTransition } from "./components/GoldUI";
 
 const queryClient = new QueryClient();
 
@@ -24,13 +25,15 @@ const App = () => (
       <Sonner />
       <GlobalNotifications />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/dreams" element={<Dreams />} />
-          <Route path="/play/:id" element={<GamePlay />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <PageTransition>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/dreams" element={<Dreams />} />
+            <Route path="/play/:id" element={<GamePlay />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </PageTransition>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

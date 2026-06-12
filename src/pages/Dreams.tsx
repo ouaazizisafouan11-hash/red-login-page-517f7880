@@ -1,4 +1,4 @@
-import { AnimatedSection, GoldDivider, GoldNav } from "@/components/GoldUI";
+import { AnimatedSection, GoldCorners, GoldDivider, GoldNav } from "@/components/GoldUI";
 
 const Dreams = () => {
   return (
@@ -10,12 +10,16 @@ const Dreams = () => {
           className="relative rounded-lg border border-border/60 bg-card/80 p-6 backdrop-blur-sm sm:p-8"
           style={{ boxShadow: "var(--shadow-glow)" }}
         >
+          <GoldCorners />
           <h2 className="text-glow font-display mb-2 text-center text-2xl font-bold tracking-wide text-gold-gradient sm:text-3xl">
             My Dreams
           </h2>
           <GoldDivider ornament="✦" />
           <ul className="space-y-6 font-serif-elegant text-xl text-foreground sm:text-2xl">
-            <li className="flex items-start gap-3">
+            <li
+              className="flex items-start gap-3 animate-fade-in"
+              style={{ animationDelay: "250ms", animationFillMode: "both" }}
+            >
               <span className="font-script text-2xl text-accent">✧</span>
               <div>
                 <strong className="font-display text-lg tracking-wide text-primary">Dream One:</strong>{" "}
@@ -24,7 +28,10 @@ const Dreams = () => {
                 <span className="leading-relaxed"> — scoring goals at Camp Nou in front of thousands of cheering fans.</span>
               </div>
             </li>
-            <li className="flex items-start gap-3">
+            <li
+              className="flex items-start gap-3 animate-fade-in"
+              style={{ animationDelay: "450ms", animationFillMode: "both" }}
+            >
               <span className="font-script text-2xl text-accent">✧</span>
               <div>
                 <strong className="font-display text-lg tracking-wide text-primary">Dream Two:</strong>{" "}
