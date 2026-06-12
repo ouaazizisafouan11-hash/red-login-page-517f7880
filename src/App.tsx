@@ -24,13 +24,15 @@ const App = () => (
       <Sonner />
       <GlobalNotifications />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/dreams" element={<Dreams />} />
-          <Route path="/play/:id" element={<GamePlay />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <PageTransition>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/dreams" element={<Dreams />} />
+            <Route path="/play/:id" element={<GamePlay />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </PageTransition>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
