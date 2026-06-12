@@ -1,4 +1,4 @@
-import { AnimatedSection, GoldDivider, GoldNav } from "@/components/GoldUI";
+import { AnimatedSection, GoldCorners, GoldDivider, GoldNav } from "@/components/GoldUI";
 
 const WELCOME =
   "I'm honored to meet you. My name is Adnane ouaazizi, and this is my first web project. I hope you enjoy it.";
