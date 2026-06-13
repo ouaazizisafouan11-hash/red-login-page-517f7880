@@ -3,15 +3,15 @@ import { AnimatedSection, GoldCorners, GoldDivider, GoldNav } from "@/components
 import TicTacToe from "@/components/games/TicTacToe";
 import GeometryDash from "@/components/games/GeometryDash";
 import Uno from "@/components/games/Uno";
-import DevilGame from "@/components/games/DevilGame";
+import DevilGame from "@/components/games/LevelDevil";
 
 type GameKey = "xo" | "dash" | "uno" | "devil";
 
 const GAMES: { key: GameKey; title: string; icon: string; desc: string }[] = [
-  { key: "xo", title: "Tic Tac Toe", icon: "✖️⭕", desc: "Beat the unbeatable computer" },
-  { key: "dash", title: "Geometry Dash", icon: "🟨", desc: "Jump over the golden spikes" },
-  { key: "uno", title: "Uno", icon: "🃏", desc: "Card duel vs the computer" },
-  { key: "devil", title: "Live the Devil", icon: "😈", desc: "Dodge the falling devils" },
+  { key: "xo", title: "Tic Tac Toe", icon: "✖️⭕", desc: "Play a friend or the unbeatable AI" },
+  { key: "dash", title: "Geometry Dash", icon: "🟨", desc: "Cube, ship & gravity-flip stages" },
+  { key: "uno", title: "Uno", icon: "🃏", desc: "4-player card duel with +2 / +4 / wild" },
+  { key: "devil", title: "Level Devil", icon: "😈", desc: "Troll platformer — the floor lies" },
 ];
 
 const MiniGames = () => {
