@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 type Cell = "X" | "O" | null;
+type Mode = "friend" | "ai";
 
 const LINES = [
   [0, 1, 2],
@@ -22,13 +23,11 @@ function winnerOf(b: Cell[]): { player: Cell; line: number[] } | null {
   return null;
 }
 
-// Minimax: O is the AI, X is the human
 function minimax(b: Cell[], isMax: boolean): number {
   const w = winnerOf(b);
   if (w?.player === "O") return 10;
   if (w?.player === "X") return -10;
   if (b.every(Boolean)) return 0;
-
   const scores = b
     .map((cell, i) => {
       if (cell) return null;
@@ -37,7 +36,6 @@ function minimax(b: Cell[], isMax: boolean): number {
       return minimax(next, !isMax);
     })
     .filter((s): s is number => s !== null);
-
   return isMax ? Math.max(...scores) : Math.min(...scores);
 }
 
@@ -58,13 +56,31 @@ function bestMove(b: Cell[]): number {
 }
 
 const TicTacToe = () => {
+  const [mode, setMode] = useState<Mode | null>(null);
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
+  const [turn, setTurn] = useState<"X" | "O">("X");
   const result = useMemo(() => winnerOf(board), [board]);
   const full = board.every(Boolean);
   const over = !!result || full;
 
+  const reset = () => {
+    setBoard(Array(9).fill(null));
+    setTurn("X");
+  };
+
   const play = (i: number) => {
     if (board[i] || over) return;
+
+    if (mode === "friend") {
+      const next = board.slice();
+      next[i] = turn;
+      setBoard(next);
+      setTurn(turn === "X" ? "O" : "X");
+      return;
+    }
+
+    // AI mode: human is X, computer is O
+    if (turn !== "X") return;
     const afterHuman = board.slice();
     afterHuman[i] = "X";
     if (winnerOf(afterHuman) || afterHuman.every(Boolean)) {
@@ -76,15 +92,51 @@ const TicTacToe = () => {
     setBoard(afterHuman);
   };
 
-  const reset = () => setBoard(Array(9).fill(null));
+  if (!mode) {
+    return (
+      <div className="flex flex-col items-center gap-6 py-4">
+        <p className="font-display text-lg tracking-wide text-accent">Choose how to play</p>
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <button
+            onClick={() => {
+              setMode("friend");
+              reset();
+            }}
+            className="relative w-56 rounded-lg border border-border/60 bg-card/80 p-6 text-center transition-all hover:-translate-y-1 hover:border-primary/70"
+            style={{ boxShadow: "var(--shadow-glow)" }}
+          >
+            <div className="mb-2 text-3xl">👥</div>
+            <h4 className="font-display text-lg text-gold-gradient">With a friend</h4>
+            <p className="mt-1 text-sm text-muted-foreground">Two players, X and O</p>
+          </button>
+          <button
+            onClick={() => {
+              setMode("ai");
+              reset();
+            }}
+            className="relative w-56 rounded-lg border border-border/60 bg-card/80 p-6 text-center transition-all hover:-translate-y-1 hover:border-primary/70"
+            style={{ boxShadow: "var(--shadow-glow)" }}
+          >
+            <div className="mb-2 text-3xl">🤖</div>
+            <h4 className="font-display text-lg text-gold-gradient">Vs computer</h4>
+            <p className="mt-1 text-sm text-muted-foreground">You are X — beat the AI</p>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const status = result
-    ? result.player === "X"
-      ? "🎉 You win!"
-      : "😈 The computer wins"
+    ? mode === "ai"
+      ? result.player === "X"
+        ? "🎉 You win!"
+        : "😈 The computer wins"
+      : `🎉 Player ${result.player} wins!`
     : full
       ? "🤝 Draw"
-      : "Your turn (X)";
+      : mode === "ai"
+        ? "Your turn (X)"
+        : `Turn: Player ${turn}`;
 
   return (
     <div className="flex flex-col items-center gap-5">
@@ -99,7 +151,7 @@ const TicTacToe = () => {
               disabled={!!cell || over}
               className={`flex h-20 w-20 items-center justify-center rounded-md border text-4xl font-bold transition-all sm:h-24 sm:w-24 ${
                 highlight
-                  ? "border-primary bg-primary/15 text-gold-gradient text-glow"
+                  ? "border-primary bg-primary/15 text-glow"
                   : "border-border/60 bg-secondary/60 hover:border-primary/70 hover:bg-secondary"
               } ${cell === "X" ? "text-primary" : "text-accent"}`}
             >
@@ -108,9 +160,21 @@ const TicTacToe = () => {
           );
         })}
       </div>
-      <Button onClick={reset} variant="outline" className="border-primary/60 text-accent">
-        New game
-      </Button>
+      <div className="flex gap-3">
+        <Button onClick={reset} variant="outline" className="border-primary/60 text-accent">
+          New game
+        </Button>
+        <Button
+          onClick={() => {
+            setMode(null);
+            reset();
+          }}
+          variant="ghost"
+          className="text-muted-foreground"
+        >
+          Change mode
+        </Button>
+      </div>
     </div>
   );
 };
