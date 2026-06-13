@@ -94,6 +94,7 @@ const links = [
   { to: "/", label: "Welcome" },
   { to: "/about", label: "About Me" },
   { to: "/dreams", label: "My Dreams" },
+  { to: "/mini-games", label: "Mini Games" },
 ];
 
 export const GoldNav = () => {
